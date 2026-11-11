@@ -2,16 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+html { scroll-behavior: smooth; }
 body {
   @apply bg-ink text-white antialiased;
+  background-image: radial-gradient(60rem 28rem at 50% -8%, rgba(245, 200, 75, 0.09), transparent 70%);
+  background-repeat: no-repeat;
 }
+::selection { background: rgba(245, 200, 75, 0.35); }
 
-/* Reusable pieces used across all pages */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes grow { from { transform: scaleX(0); } }
+@keyframes ring { from { stroke-dashoffset: var(--c); } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
 @layer components {
   .card {
-    @apply rounded-2xl border border-line bg-panel p-6;
+    @apply rounded-2xl border border-line bg-gradient-to-b from-[#181409] to-panel p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)];
+  }
+  .card-hover {
+    @apply transition duration-200 hover:-translate-y-0.5 hover:border-gold/60 hover:shadow-[0_10px_30px_-12px_rgba(245,200,75,0.35)];
   }
   .btn-gold {
-    @apply rounded-lg bg-gold px-5 py-2.5 font-semibold text-ink transition hover:bg-gold-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold;
+    @apply rounded-lg bg-gradient-to-r from-gold-dark via-gold to-[#ffe58a] px-5 py-2.5 font-semibold text-ink shadow-[0_4px_20px_-8px_rgba(245,200,75,0.6)] transition duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold;
   }
+  .btn-outline {
+    @apply rounded-lg border border-line px-5 py-2.5 text-sm transition duration-200 hover:border-gold hover:text-gold active:scale-[0.98];
+  }
+  .input {
+    @apply w-full rounded-lg border border-line bg-black/40 px-3 py-2 text-sm text-white transition duration-200 placeholder:text-mute focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/25;
+  }
+  .glass { @apply border border-white/10 bg-white/10 backdrop-blur-md; }
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-line/60 before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
+  }
+  .skeleton::before { animation: shimmer 1.4s infinite; }
+  .stagger > * { animation: fadeUp 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .stagger > *:nth-child(1) { animation-delay: 0.02s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.06s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.14s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.18s; }
+  .stagger > *:nth-child(n + 6) { animation-delay: 0.22s; }
+}
+
+/* Cards on the landing page fade in as they scroll into view (browsers without support just show them) */
+@supports (animation-timeline: view()) {
+  .reveal { animation: fadeUp linear both; animation-timeline: view(); animation-range: entry 5% entry 40%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
