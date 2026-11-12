@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
   useGetHistoryQuery,
@@ -45,10 +46,17 @@ export default function StockPage() {
 
   const toggleWatchlist = async () => {
     try {
-      if (inList) await removeFromWatchlist(symbol.toUpperCase()).unwrap();
-      else await addToWatchlist(symbol.toUpperCase()).unwrap();
+      if (inList) {
+        await removeFromWatchlist(symbol.toUpperCase()).unwrap();
+        toast.success(`Removed ${symbol.toUpperCase()} from watchlist.`);
+      } else {
+        await addToWatchlist(symbol.toUpperCase()).unwrap();
+        toast.success(`Added ${symbol.toUpperCase()} to watchlist!`);
+      }
     } catch (e: unknown) {
-      setNote((e as { data?: { message?: string } })?.data?.message ?? "Could not update watchlist.");
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not update watchlist.";
+      setNote(msg);
+      toast.error(msg);
     }
   };
 
@@ -62,9 +70,13 @@ export default function StockPage() {
     try {
       await createAlert({ symbol: stock.symbol, conditions: conditions as Parameters<typeof createAlert>[0]["conditions"], channels: { email: c.email, push: c.push, discord: c.discord } }).unwrap();
       setAlertOpen(false);
-      setNote(`Alert set for ${stock.symbol}. You can manage it on the Alerts page.`);
+      const msg = `Alert set for ${stock.symbol}. You can manage it on the Alerts page.`;
+      setNote(msg);
+      toast.success(msg);
     } catch (e: unknown) {
-      setNote((e as { data?: { message?: string } })?.data?.message ?? "Could not create alert.");
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not create alert.";
+      setNote(msg);
+      toast.error(msg);
     }
   };
 

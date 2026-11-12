@@ -11,7 +11,18 @@ const today = () => new Date().toLocaleDateString("en-US", { month: "short", day
 export function configToAlerts(symbol: string, c: AlertConfig, base = Date.now()): AlertItem[] {
   const channels = { email: c.email, push: c.push, discord: c.discord };
   const out: AlertItem[] = [];
-  const add = (kind: AlertKind, value: number | Signal) => out.push({ id: base + out.length, symbol, kind, value, channels, created: today(), active: true });
+  const add = (kind: AlertKind, value: number | Signal) =>
+    out.push({
+      id: String(base + out.length),
+      symbol,
+      name: symbol,
+      kind,
+      value,
+      channels,
+      createdAt: today(),
+      lastTriggeredAt: null,
+      active: true,
+    });
   if (c.price !== undefined) add("price", c.price);
   if (c.breakout !== undefined) add("breakout", c.breakout);
   if (c.signal !== undefined) add("signal", c.signal);

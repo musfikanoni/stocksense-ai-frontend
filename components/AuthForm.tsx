@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import AuthShell from "./AuthShell";
 import Terms from "./Terms";
 import { Brand } from "./icons";
@@ -42,12 +43,15 @@ function parseApiError(err: unknown, isSignup: boolean): string {
 
   // 1. Response data from backend
   if (e.data) {
-    if (typeof e.data === "string" && e.data.trim()) return e.data;
-    if (typeof e.data.message === "string" && e.data.message.trim()) {
-      return e.data.message;
-    }
-    if (typeof e.data.error === "string" && e.data.error.trim()) {
-      return e.data.error;
+    if (typeof e.data === "string" && e.data.trim()) return e.data.trim();
+    if (typeof e.data === "object") {
+      const dataObj = e.data as { message?: string; error?: string };
+      if (typeof dataObj.message === "string" && dataObj.message.trim()) {
+        return dataObj.message;
+      }
+      if (typeof dataObj.error === "string" && dataObj.error.trim()) {
+        return dataObj.error;
+      }
     }
   }
 
@@ -135,28 +139,28 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     if (signup && !name) {
       const msg = "Please enter your name.";
       setError(msg);
-      if (typeof window !== "undefined") window.alert(msg);
+      toast.error(msg);
       return;
     }
 
     if (!email) {
       const msg = "Please enter a valid email address.";
       setError(msg);
-      if (typeof window !== "undefined") window.alert(msg);
+      toast.error(msg);
       return;
     }
 
     if (signup && pwd.length < 6) {
       const msg = "Password must be at least 6 characters long.";
       setError(msg);
-      if (typeof window !== "undefined") window.alert(msg);
+      toast.error(msg);
       return;
     }
 
     if (signup && pwd !== confirm) {
       const msg = "Passwords do not match. Please verify and re-type.";
       setError(msg);
-      if (typeof window !== "undefined") window.alert(msg);
+      toast.error(msg);
       return;
     }
 
@@ -167,33 +171,27 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
           email,
           password: pwd,
         }).unwrap();
+        toast.success("Account created successfully!");
         handleSession(res.token, res.user);
       } else {
         const res = await loginApi({
           email,
           password: pwd,
         }).unwrap();
+        toast.success("Signed in successfully!");
         handleSession(res.token, res.user);
       }
     } catch (err: unknown) {
       const errorMsg = parseApiError(err, signup);
       setError(errorMsg);
-      if (typeof window !== "undefined") {
-        try {
-          window.alert(errorMsg);
-        } catch {}
-      }
+      toast.error(errorMsg);
     }
   };
 
   const handleGoogleClick = () => {
     const msg = "Google Sign-In is only enabled when Google OAuth is configured. Please sign in with email and password.";
     setError(msg);
-    if (typeof window !== "undefined") {
-      try {
-        window.alert(msg);
-      } catch {}
-    }
+    toast.info(msg);
   };
 
   return (

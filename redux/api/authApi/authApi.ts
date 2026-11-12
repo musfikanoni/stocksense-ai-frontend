@@ -113,7 +113,16 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
-    getAvatarSignature: builder.mutation<unknown, void>({
+    getAvatarSignature: builder.mutation<
+      {
+        uploadUrl: string;
+        apiKey: string;
+        timestamp: number;
+        signature: string;
+        fields: Record<string, string>;
+      },
+      void
+    >({
       query: () => ({
         url: "/api/auth/me/avatar/signature",
         method: "POST",

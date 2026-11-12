@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   useGetAdminUserQuery,
   useBlockUserMutation,
@@ -12,6 +13,17 @@ export default function AdminUserDetail() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useGetAdminUserQuery(id);
   const [blockUser] = useBlockUserMutation();
+
+  const handleToggleBlock = async () => {
+    if (!data?.user) return;
+    try {
+      await blockUser({ id: data.user.id, blocked: !data.user.blocked }).unwrap();
+      toast.success(data.user.blocked ? `Unblocked user ${data.user.name}.` : `Blocked user ${data.user.name}.`);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not update user block status.";
+      toast.error(msg);
+    }
+  };
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-40" /><Skeleton className="h-60" /></div>;
   if (!data?.user) return <p className="text-down">We could not find that user. <Link href="/admin/users" className="underline">Back to users</Link></p>;
@@ -29,9 +41,7 @@ export default function AdminUserDetail() {
           <p className="text-sm text-mute">{user.email}</p>
           <p className="text-xs text-mute mt-1">Joined {new Date(user.joinedAt).toLocaleDateString()}</p>
         </div>
-        <button onClick={() => blockUser({ id: user.id, blocked: !user.blocked })} className={`rounded-lg px-4 py-1.5 text-xs font-medium text-white transition hover:brightness-110 ${user.blocked ? "bg-up/80" : "bg-down"}`}>
-          {user.blocked ? "Unblock User" : "Block User"}
-        </button>
+        <button onClick={handleToggleBlock} className={`rounded-lg px-4 py-1.5 text-xs font-medium text-white transition hover:brightness-110 ${user.blocked ? "bg-up/80" : "bg-down"}`}>{user.blocked ? "Unblock User" : "Block User"}</button>
       </section>
       <section className="card flex items-center justify-between">
         <div><h2 className="font-semibold">Current Plan</h2><p className="mt-1 text-sm text-mute">{user.planLabel}</p></div>

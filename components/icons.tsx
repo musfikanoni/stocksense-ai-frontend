@@ -24,6 +24,7 @@ const paths: Record<string, React.ReactNode> = {
   logout: <path d="M9 21H5V3h4M16 17l5-5-5-5M21 12H9" />,
   doc: <path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" />,
   trend: <path d="M3 17l6-6 4 4 8-8M15 7h6v6" />,
+  camera: <><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></>,
 };
 
 export function Icon({ name, className = "h-4 w-4" }: { name: string; className?: string }) {

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useGetPlansQuery } from "@/redux/api/plansApi";
 import {
   useAdminCreatePlanMutation,
@@ -18,12 +19,30 @@ export default function AdminPlans() {
   const [modal, setModal] = useState<{ plan?: Plan } | null>(null);
 
   const handleSave = async (p: UiPlan) => {
-    if (modal?.plan) {
-      await updatePlan({ id: modal.plan._id, name: p.name, price: p.price, highlight: p.highlight, features: p.features });
-    } else {
-      await createPlan({ name: p.name, price: p.price, highlight: p.highlight, features: p.features });
+    try {
+      if (modal?.plan) {
+        await updatePlan({ id: modal.plan._id, name: p.name, price: p.price, highlight: p.highlight, features: p.features }).unwrap();
+        toast.success(`Plan "${p.name}" updated successfully!`);
+      } else {
+        await createPlan({ name: p.name, price: p.price, highlight: p.highlight, features: p.features }).unwrap();
+        toast.success(`Plan "${p.name}" created successfully!`);
+      }
+      setModal(null);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not save plan.";
+      toast.error(msg);
     }
-    setModal(null);
+  };
+
+  const handleToggleHighlight = async (p: Plan) => {
+    const id = p._id ?? String(p.id);
+    try {
+      await updatePlan({ id, name: p.name, price: p.price, highlight: !p.highlight, features: p.features }).unwrap();
+      toast.success(`Highlight toggled for ${p.name}.`);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not update highlight.";
+      toast.error(msg);
+    }
   };
 
   if (isLoading) return <div className="card text-center text-mute">Loading plans…</div>;
@@ -40,7 +59,7 @@ export default function AdminPlans() {
                 <h3 className="font-semibold">{p.name}</h3>
                 <span className="flex items-center gap-2 text-xs text-mute">
                   Highlight
-                  <Switch on={p.highlight} onChange={() => updatePlan({ id, name: p.name, price: p.price, highlight: !p.highlight, features: p.features })} label={`Highlight ${p.name}`} />
+                  <Switch on={p.highlight} onChange={() => handleToggleHighlight(p)} label={`Highlight ${p.name}`} />
                 </span>
               </div>
               <p className="mt-3 border-b border-line pb-4 text-3xl font-bold">{p.price}$<span className="text-sm font-normal text-mute">/month</span></p>
@@ -55,7 +74,7 @@ export default function AdminPlans() {
       </div>
       {modal && (
         <PlanModal
-          plan={modal.plan ? { id: 1, name: modal.plan.name, price: modal.plan.price, highlight: modal.plan.highlight, features: modal.plan.features } : undefined}
+          plan={modal.plan}
           onClose={() => setModal(null)}
           onSave={handleSave}
         />

@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Icon } from "./icons";
 import { useAuth } from "@/lib/authContext";
 import Avatar from "./Avatar";
+import CompanyLogo from "./CompanyLogo";
+import { Change, usd } from "./ui";
+import { useGetStocksQuery } from "@/redux/api/stocksApi";
 import {
   useGetNotificationsQuery,
   useMarkAllReadMutation,
@@ -31,14 +34,37 @@ export default function Topbar() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [q, setQ] = useState("");
+  const [openSearch, setOpenSearch] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [openNotif, setOpenNotif] = useState(false);
   const [openUserMenu, setOpenUserMenu] = useState(false);
 
   const notifBox = useRef<HTMLDivElement>(null);
   const userBox = useRef<HTMLDivElement>(null);
+  const searchBox = useRef<HTMLDivElement>(null);
 
   const admin = path.startsWith("/admin");
   const title = path.startsWith("/stocks") ? titleOf(`/${from ?? "dashboard"}`) : titleOf(path);
+
+  // Debounced live search
+  const [debouncedQ, setDebouncedQ] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQ(q.trim());
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [q]);
+
+  const { data: searchResults = [], isFetching: isSearching } = useGetStocksQuery(
+    { q: debouncedQ },
+    { skip: !debouncedQ || admin }
+  );
+
+  const showDropdown = openSearch && q.trim().length > 0 && !admin;
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [debouncedQ]);
 
   // Notifications – admin vs user
   const { data: userNotif, refetch: refetchUser } = useGetNotificationsQuery(undefined, { skip: admin || !user });
@@ -54,11 +80,13 @@ export default function Topbar() {
     const click = (e: MouseEvent) => {
       if (!notifBox.current?.contains(e.target as Node)) setOpenNotif(false);
       if (!userBox.current?.contains(e.target as Node)) setOpenUserMenu(false);
+      if (!searchBox.current?.contains(e.target as Node)) setOpenSearch(false);
     };
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpenNotif(false);
         setOpenUserMenu(false);
+        setOpenSearch(false);
       }
     };
     document.addEventListener("mousedown", click);
@@ -81,29 +109,141 @@ export default function Topbar() {
     router.push("/login");
   };
 
+  const handleSelectStock = (symbol: string) => {
+    setOpenSearch(false);
+    setQ("");
+    router.push(`/stocks/${symbol}?from=${from ?? "dashboard"}`);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!q.trim() || admin) return;
+    if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
+      handleSelectStock(searchResults[selectedIndex].symbol);
+    } else if (searchResults.length > 0) {
+      handleSelectStock(searchResults[0].symbol);
+    } else {
+      handleSelectStock(q.trim().toUpperCase());
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDropdown || searchResults.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : searchResults.length - 1));
+    }
+  };
+
   const fullName = user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Account");
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-line bg-ink/80 px-6 py-4 backdrop-blur">
-      <span className="text-lg font-semibold text-gold">{title}</span>
-      <form
-        role="search"
-        className="relative hidden w-full max-w-sm sm:block"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (q.trim() && !admin)
-            router.push(`/stocks/${q.trim().toUpperCase()}?from=${from ?? "dashboard"}`);
-        }}
-      >
-        <Icon name="search" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-mute" />
-        <input
-          className="input !rounded-full !pl-9"
-          placeholder={admin ? "Search admin records..." : "Search stocks... (e.g. AAPL)"}
-          aria-label="Search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-      </form>
+      <span className="text-lg font-semibold text-gold shrink-0">{title}</span>
+
+      {/* Live Search Bar for User Dashboard */}
+      {!admin ? (
+        <div ref={searchBox} className="relative flex-1 max-w-sm">
+          <form role="search" onSubmit={handleSearchSubmit} className="relative">
+            <Icon
+              name="search"
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-mute pointer-events-none"
+            />
+            <input
+              className="input !rounded-full !pl-9 !pr-8 text-sm w-full transition focus:border-gold/60"
+              placeholder="Search stocks... (e.g. AAPL, Tesla)"
+              aria-label="Search stocks"
+              value={q}
+              onFocus={() => {
+                if (q.trim()) setOpenSearch(true);
+              }}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setOpenSearch(true);
+              }}
+              onKeyDown={handleSearchKeyDown}
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setOpenSearch(false);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mute hover:text-white"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </form>
+
+          {showDropdown && (
+            <div className="card animate-scale-in absolute left-0 top-full z-40 mt-2 w-full !p-2 shadow-2xl max-h-80 overflow-y-auto">
+              {isSearching ? (
+                <div className="p-4 text-center text-xs text-mute animate-pulse">
+                  Searching equities...
+                </div>
+              ) : searchResults.length === 0 ? (
+                <div className="p-4 text-center">
+                  <p className="text-sm font-medium text-white/90">No stocks found</p>
+                  <p className="mt-1 text-xs text-mute">
+                    No matching stocks for &ldquo;{debouncedQ}&rdquo;.
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div className="px-2 py-1 text-[11px] font-semibold text-mute uppercase tracking-wider">
+                    Equities ({searchResults.length})
+                  </div>
+                  <ul className="divide-y divide-line/40">
+                    {searchResults.map((s, idx) => (
+                      <li key={s.symbol}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectStock(s.symbol)}
+                          className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left rounded-lg text-sm transition ${
+                            selectedIndex === idx
+                              ? "bg-white/10 text-gold"
+                              : "hover:bg-white/5 text-white"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <CompanyLogo symbol={s.symbol} size={28} />
+                            <div className="min-w-0">
+                              <span className="font-bold text-sm leading-tight block">
+                                {s.symbol}
+                              </span>
+                              <span className="text-xs text-mute truncate block max-w-[140px] sm:max-w-[180px]">
+                                {s.name}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            {s.price !== null && (
+                              <div className="font-medium text-xs">
+                                {usd(s.price)}
+                              </div>
+                            )}
+                            <div className="text-[11px]">
+                              {s.change !== null && <Change v={s.change} />}
+                            </div>
+                          </div>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1" />
+      )}
       <div className="flex items-center gap-4">
         {/* Notifications */}
         <div ref={notifBox} className="relative">

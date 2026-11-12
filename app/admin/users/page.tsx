@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import {
   useGetAdminStatsQuery,
   useGetAdminUsersQuery,
@@ -23,6 +24,16 @@ export default function AdminUsers() {
     plan: plan !== "All Plan" ? plan : undefined,
   });
   const [blockUser] = useBlockUserMutation();
+
+  const handleBlock = async (u: { id: string; name: string; blocked: boolean }) => {
+    try {
+      await blockUser({ id: u.id, blocked: !u.blocked }).unwrap();
+      toast.success(u.blocked ? `Unblocked ${u.name}.` : `Blocked ${u.name}.`);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not update user status.";
+      toast.error(msg);
+    }
+  };
 
   const users = usersData?.users ?? [];
 
@@ -59,7 +70,7 @@ export default function AdminUsers() {
                   <td><span className={`rounded-full px-2.5 py-0.5 text-xs ${u.blocked ? "bg-down/15 text-down" : "bg-up/15 text-up"}`}>{u.blocked ? "Blocked" : "Active"}</span></td>
                   <td className="text-right"><span className="inline-flex gap-2">
                     <Link href={`/admin/users/${u.id}`} className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-110">View Profile</Link>
-                    <button onClick={() => blockUser({ id: u.id, blocked: !u.blocked })} className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-110 ${u.blocked ? "bg-up/80" : "bg-down"}`}>{u.blocked ? "Unblock" : "Block"}</button>
+                    <button onClick={() => handleBlock(u)} className={`rounded-lg px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-110 ${u.blocked ? "bg-up/80" : "bg-down"}`}>{u.blocked ? "Unblock" : "Block"}</button>
                   </span></td>
                 </tr>
               ))}

@@ -2,12 +2,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Avatar from "./Avatar";
 import { Icon } from "./icons";
 import {
   useUpdateMeMutation,
   useChangePasswordMutation,
   useDeleteAccountMutation,
+  useGetAvatarSignatureMutation,
+  useUpdateAvatarMutation,
+  useDeleteAvatarMutation,
 } from "@/redux/api/authApi";
 import {
   useGetBillingQuery,
@@ -47,13 +51,19 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
   const { data: policy } = useGetPolicyQuery(undefined, {
     skip: !tabs.includes("policy"),
   });
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
   const [createPortal, { isLoading: isPortalLoading }] = useCreatePortalMutation();
   const [updateMe, { isLoading: isUpdatingProfile }] = useUpdateMeMutation();
   const [changePassword, { isLoading: isChangingPw }] = useChangePasswordMutation();
   const [deleteAccountApi, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
+  const [getAvatarSignature] = useGetAvatarSignatureMutation();
+  const [updateAvatar] = useUpdateAvatarMutation();
+  const [deleteAvatar] = useDeleteAvatarMutation();
 
   const busy =
-    isPortalLoading || isUpdatingProfile || isChangingPw || isDeletingAccount;
+    isPortalLoading || isUpdatingProfile || isChangingPw || isDeletingAccount || isUploadingAvatar;
   const full = user ? `${user.firstName} ${user.lastName}`.trim() : "";
 
   useEffect(() => {
@@ -62,6 +72,86 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
   }, [confirmDel]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type)) {
+      toast.error("Please select a valid image file (JPG, PNG, or WEBP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size must be less than 5MB.");
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setAvatarPreview(localPreview);
+    setIsUploadingAvatar(true);
+
+    try {
+      const ticket = await getAvatarSignature().unwrap();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", ticket.apiKey);
+      formData.append("timestamp", String(ticket.timestamp));
+      formData.append("signature", ticket.signature);
+      if (ticket.fields) {
+        Object.entries(ticket.fields).forEach(([k, v]) => {
+          formData.append(k, String(v));
+        });
+      }
+
+      const res = await fetch(ticket.uploadUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.error?.message || "Failed to upload image to cloud storage.");
+      }
+
+      const data = await res.json();
+      if (!data.secure_url) {
+        throw new Error("No image URL returned from upload provider.");
+      }
+
+      const updated = await updateAvatar({ url: data.secure_url }).unwrap();
+      setUser(updated.user);
+      setAvatarPreview(null);
+      toast.success("Profile picture updated successfully!");
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { data?: { message?: string } })?.data?.message ||
+        (err as Error)?.message ||
+        "Could not update profile picture. Please verify backend cloud storage credentials.";
+      toast.error(errorMsg);
+      setAvatarPreview(null);
+    } finally {
+      setIsUploadingAvatar(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setIsUploadingAvatar(true);
+    try {
+      const updated = await deleteAvatar().unwrap();
+      setUser(updated.user);
+      setAvatarPreview(null);
+      toast.success("Profile picture removed.");
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { data?: { message?: string } })?.data?.message ||
+        "Could not remove profile picture.";
+      toast.error(errorMsg);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,17 +163,24 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
       setUser(res.user);
       setEditing(false);
       setMsg("Profile saved.");
+      toast.success("Profile saved successfully!");
     } catch (error: unknown) {
       const msg =
         (error as { data?: { message?: string } })?.data?.message ||
         "Could not save profile.";
       setErr(msg);
+      toast.error(msg);
     }
   };
 
   const changePw = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw.next !== pw.again) return setErr("New passwords do not match.");
+    if (pw.next !== pw.again) {
+      const msg = "New passwords do not match.";
+      setErr(msg);
+      toast.error(msg);
+      return;
+    }
     try {
       const res = await changePassword({
         currentPassword: pw.cur,
@@ -96,17 +193,20 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
       setErr("");
       setPw({ cur: "", next: "", again: "" });
       setMsg("Password updated.");
+      toast.success("Password updated successfully!");
     } catch (error: unknown) {
       const msg =
         (error as { data?: { message?: string } })?.data?.message ||
         "Could not change password.";
       setErr(msg);
+      toast.error(msg);
     }
   };
 
   const deleteAccount = async () => {
     try {
       await deleteAccountApi({ password: delPw }).unwrap();
+      toast.success("Account deleted successfully.");
       logout();
       router.push("/");
     } catch (error: unknown) {
@@ -114,6 +214,7 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
         (error as { data?: { message?: string } })?.data?.message ||
         "Could not delete account.";
       setErr(msg);
+      toast.error(msg);
       setConfirmDel(false);
     }
   };
@@ -123,7 +224,9 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
       const { url } = await createPortal().unwrap();
       window.location.href = url;
     } catch {
-      setMsg("Billing portal is not configured yet.");
+      const msg = "Billing portal is not configured yet.";
+      setMsg(msg);
+      toast.info(msg);
     }
   };
 
@@ -161,11 +264,12 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
       {tab === "profile" && !editing && (
         <section className={`card animate-fade-up ${box} space-y-4 text-center`}>
           <div className="flex justify-center">
-            <Avatar name={full} size={88} />
+            <Avatar name={full} url={user?.avatarUrl} size={88} />
           </div>
           <div>
             <p className="text-lg font-semibold">{full}</p>
             <p className="text-sm text-mute">{user?.email}</p>
+            <p className="text-xs text-gold mt-1 font-medium">{user?.planLabel || "Free Tier"}</p>
           </div>
           <button
             className="btn-gold w-full"
@@ -197,9 +301,68 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
           className={`card animate-fade-up ${box} space-y-4`}
           onSubmit={saveProfile}
         >
-          <div className="flex justify-center">
-            <Avatar name={`${draft.first} ${draft.last}`} size={72} />
+          {/* Profile Picture Upload & Edit */}
+          <div className="flex flex-col items-center gap-2 pb-2">
+            <div className="relative group">
+              <Avatar
+                name={`${draft.first} ${draft.last}`}
+                url={avatarPreview || user?.avatarUrl}
+                size={84}
+              />
+              <label
+                htmlFor="avatar-file-upload"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition cursor-pointer text-xs text-white"
+                title="Change profile picture"
+              >
+                <Icon name="camera" className="h-5 w-5 mb-0.5 text-gold" />
+                <span className="text-[11px] font-medium">Change</span>
+              </label>
+
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/75">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-gold border-t-transparent" />
+                </div>
+              )}
+            </div>
+
+            <input
+              id="avatar-file-upload"
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              className="hidden"
+              onChange={handleAvatarChange}
+              disabled={isUploadingAvatar}
+            />
+
+            <div className="flex items-center gap-3 text-xs">
+              <label
+                htmlFor="avatar-file-upload"
+                className={`font-medium transition ${
+                  isUploadingAvatar
+                    ? "text-mute cursor-not-allowed"
+                    : "text-gold hover:underline cursor-pointer"
+                }`}
+              >
+                {isUploadingAvatar ? "Uploading picture..." : "Upload Photo"}
+              </label>
+
+              {(user?.avatarUrl || avatarPreview) && (
+                <>
+                  <span className="text-mute">•</span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={isUploadingAvatar}
+                    className="text-down hover:underline font-medium transition disabled:opacity-50"
+                  >
+                    Remove Photo
+                  </button>
+                </>
+              )}
+            </div>
+            <p className="text-[11px] text-mute">JPG, PNG, or WEBP (Max 5MB)</p>
           </div>
+
           <label className="block text-sm">
             <span className="mb-1 block text-mute">First Name</span>
             <input
@@ -231,7 +394,10 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
             <button
               type="button"
               className="btn-outline flex-1"
-              onClick={() => setEditing(false)}
+              onClick={() => {
+                setEditing(false);
+                setAvatarPreview(null);
+              }}
             >
               Cancel
             </button>

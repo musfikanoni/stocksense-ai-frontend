@@ -28,7 +28,8 @@ export default function PlanModal({ plan, onSave, onClose }: { plan?: Plan; onSa
     if (!name.trim()) return setErr("Enter a plan name.");
     if (price.trim() === "" || Number.isNaN(n) || n < 0) return setErr("Enter a valid price.");
     const all = draft.trim() && !features.includes(draft.trim()) ? [...features, draft.trim()] : features;
-    onSave({ id: plan?.id ?? Date.now(), name: name.trim(), price: n, highlight, features: all });
+    const fallbackId = plan?._id ?? plan?.id ?? String(Date.now());
+    onSave({ _id: fallbackId, id: fallbackId, name: name.trim(), price: n, highlight, features: all });
   };
 
   return (

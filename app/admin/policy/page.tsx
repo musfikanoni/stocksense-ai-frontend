@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useGetPolicyQuery } from "@/redux/api/plansApi";
 import { useAdminUpdatePolicyMutation } from "@/redux/api/adminApi";
 import { Icon } from "@/components/icons";
@@ -23,11 +24,16 @@ export default function AdminPolicy() {
 
   const save = async (key: string) => {
     setBusy(key);
+    const title = key === "privacy" ? "Privacy Policy" : "Terms & Conditions";
     try {
       await updatePolicy({ key, text: texts[key] ?? "" }).unwrap();
-      setMsg(`Saved ${key === "privacy" ? "Privacy Policy" : "Terms & Conditions"}. It is now live.`);
+      const successMsg = `Saved ${title}. It is now live.`;
+      setMsg(successMsg);
+      toast.success(successMsg);
     } catch {
-      setMsg(`Could not save ${key}.`);
+      const errorMsg = `Could not save ${title}.`;
+      setMsg(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setBusy(null);
     }

@@ -96,7 +96,7 @@ export const adminApi = baseApi.injectEndpoints({
       query: ({ key, text }) => ({
         url: `/api/admin/policy/${key}`,
         method: "PUT",
-        body,
+        body: { text },
       }),
       invalidatesTags: ["Policy"],
     }),

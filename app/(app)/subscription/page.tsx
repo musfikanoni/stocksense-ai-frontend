@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useGetPlansQuery } from "@/redux/api/plansApi";
 import {
   useGetBillingQuery,
@@ -21,10 +22,13 @@ export default function Subscription() {
     setBusy(planId);
     setErr("");
     try {
+      toast.info(`Preparing checkout for ${planName}...`);
       const { url } = await checkout({ planId, cycle: "Monthly" }).unwrap();
       window.location.href = url;
     } catch (e: unknown) {
-      setErr((e as { data?: { message?: string } })?.data?.message ?? `Could not start checkout for ${planName}.`);
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? `Could not start checkout for ${planName}.`;
+      setErr(msg);
+      toast.error(msg);
     } finally {
       setBusy(null);
     }

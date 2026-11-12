@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Icon } from "./icons";
 
 export default function ContactModal() {
@@ -19,7 +20,7 @@ export default function ContactModal() {
           <div className="card animate-scale-in w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between"><h2 className="font-semibold">Message Us</h2><button onClick={() => setOpen(false)} aria-label="Close" className="text-mute hover:text-white"><Icon name="x" /></button></div>
             {sent ? <p role="status" className="py-6 text-center text-up">Thanks! We will get back to you soon.</p> : (
-              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setSent(true); toast.success("Thank you! Your message has been sent."); }}>
                 <input required aria-label="Name" placeholder="Your name" className="input" />
                 <input required type="email" aria-label="Email" placeholder="Your email" className="input" />
                 <textarea required rows={4} aria-label="Message" placeholder="How can we help?" className="input" />

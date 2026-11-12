@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import {
   useGetAlertsQuery,
   useUpdateAlertMutation,
@@ -40,8 +41,34 @@ export default function Alerts() {
     if (c.volume !== undefined) conditions.volume = c.volume;
     const kind = (Object.keys(conditions)[0] as AlertItem["kind"]) ?? editing.kind;
     const value = Object.values(conditions)[0] ?? editing.value;
-    await updateAlert({ id: editing.id, body: { kind, value: value as number | Signal, channels: { email: c.email, push: c.push, discord: c.discord } } });
-    setEditing(null);
+    try {
+      await updateAlert({ id: editing.id, body: { kind, value: value as number | Signal, channels: { email: c.email, push: c.push, discord: c.discord } } }).unwrap();
+      toast.success("Alert updated successfully!");
+      setEditing(null);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not update alert.";
+      toast.error(msg);
+    }
+  };
+
+  const handleToggle = async (a: AlertItem) => {
+    try {
+      await updateAlert({ id: a.id, body: { active: !a.active } }).unwrap();
+      toast.success(a.active ? "Alert disabled." : "Alert enabled.");
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not toggle alert.";
+      toast.error(msg);
+    }
+  };
+
+  const handleDelete = async (a: AlertItem) => {
+    try {
+      await deleteAlert(a.id).unwrap();
+      toast.success("Alert deleted.");
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not delete alert.";
+      toast.error(msg);
+    }
   };
 
   if (isLoading) return <div className="space-y-3">{Array.from({ length: 4 }, (_, i) => <div key={i} className="card h-16 animate-pulse" />)}</div>;
@@ -65,11 +92,11 @@ export default function Alerts() {
             <span className="ml-auto flex items-center gap-4">
               <span className={`text-xs ${a.active ? "text-up" : "text-mute"}`}>{a.active ? "Active" : "Disable"}</span>
               <button role="switch" aria-checked={a.active} aria-label={`${a.active ? "Disable" : "Enable"} ${alertLabel(a)} for ${a.symbol}`}
-                onClick={() => updateAlert({ id: a.id, body: { active: !a.active } })}
+                onClick={() => handleToggle(a)}
                 className={`h-6 w-11 rounded-full p-0.5 transition ${a.active ? "bg-up" : "bg-line"}`}>
                 <span className={`block h-5 w-5 rounded-full bg-white transition ${a.active ? "translate-x-5" : ""}`} />
               </button>
-              <button aria-label={`Delete ${alertLabel(a)} for ${a.symbol}`} onClick={() => deleteAlert(a.id)} className="text-down hover:opacity-80"><Icon name="trash" className="h-[18px] w-[18px]" /></button>
+              <button aria-label={`Delete ${alertLabel(a)} for ${a.symbol}`} onClick={() => handleDelete(a)} className="text-down hover:opacity-80"><Icon name="trash" className="h-[18px] w-[18px]" /></button>
               <button aria-label={`Edit ${alertLabel(a)} for ${a.symbol}`} onClick={() => setEditing(a)} className="text-mute hover:text-white"><Icon name="gear" className="h-[18px] w-[18px]" /></button>
             </span>
           </li>

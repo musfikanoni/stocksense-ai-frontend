@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useGetWatchlistQuery, useRemoveFromWatchlistMutation } from "@/redux/api/watchlistApi";
 import CompanyLogo from "@/components/CompanyLogo";
 import { Icon } from "@/components/icons";
@@ -9,6 +10,16 @@ import { Change, usd } from "@/components/ui";
 export default function Watchlist() {
   const { data: rows = [], isLoading } = useGetWatchlistQuery();
   const [removeFromWatchlist] = useRemoveFromWatchlistMutation();
+
+  const handleRemove = async (symbol: string) => {
+    try {
+      await removeFromWatchlist(symbol).unwrap();
+      toast.success(`Removed ${symbol} from watchlist.`);
+    } catch (e: unknown) {
+      const msg = (e as { data?: { message?: string } })?.data?.message ?? "Could not remove from watchlist.";
+      toast.error(msg);
+    }
+  };
 
   if (isLoading) return <div className="space-y-3">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-14" />)}</div>;
 
@@ -47,7 +58,7 @@ export default function Watchlist() {
                 </td>
                 <td>{s.volume ?? "—"}</td>
                 <td className="px-6 text-right">
-                  <button onClick={() => removeFromWatchlist(s.symbol)} aria-label={`Remove ${s.symbol} from watchlist`}
+                  <button onClick={() => handleRemove(s.symbol)} aria-label={`Remove ${s.symbol} from watchlist`}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-down px-3 py-1.5 text-xs font-medium text-white transition duration-200 hover:brightness-110 active:scale-95">
                     <Icon name="trash" className="h-3.5 w-3.5" />Remove
                   </button>

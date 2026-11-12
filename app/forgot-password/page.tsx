@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Brand } from "@/components/icons";
 import Terms from "@/components/Terms";
 import {
@@ -86,6 +87,7 @@ export default function ForgotPassword() {
       if (step === 0) {
         const res = await forgotPasswordApi({ email }).unwrap();
         if (res.devOtp) setDevOtp(res.devOtp);
+        toast.success("Verification code sent to your email!");
         setStep(1);
       } else if (step === 1) {
         const res = await verifyOtpApi({
@@ -93,13 +95,17 @@ export default function ForgotPassword() {
           otp: otp.join(""),
         }).unwrap();
         setResetToken(res.resetToken);
+        toast.success("Code verified successfully!");
         setStep(2);
       } else {
         if (pw !== pw2) {
-          setErr("Passwords do not match.");
+          const m = "Passwords do not match.";
+          setErr(m);
+          toast.error(m);
           return;
         }
         await resetPasswordApi({ resetToken, password: pw }).unwrap();
+        toast.success("Password reset successfully! Redirecting to login...");
         router.push("/login");
       }
     } catch (error: unknown) {
@@ -118,6 +124,7 @@ export default function ForgotPassword() {
         e?.message ||
         "Something went wrong. Try again.";
       setErr(msg);
+      toast.error(msg);
     }
   };
 
