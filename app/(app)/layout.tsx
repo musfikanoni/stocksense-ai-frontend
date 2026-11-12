@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
+import AuthGuard from "@/components/AuthGuard";
 
 const items = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
@@ -11,12 +12,14 @@ const items = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="md:flex">
-      <Suspense fallback={null}><Sidebar items={items} premium /></Suspense>
-      <div className="min-w-0 flex-1">
-        <Suspense fallback={null}><Topbar /></Suspense>
-        <main className="p-6">{children}</main>
+    <AuthGuard>
+      <div className="md:flex">
+        <Suspense fallback={null}><Sidebar items={items} premium /></Suspense>
+        <div className="min-w-0 flex-1">
+          <Suspense fallback={null}><Topbar /></Suspense>
+          <main className="p-6">{children}</main>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

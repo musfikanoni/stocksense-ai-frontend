@@ -2,9 +2,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import AuthShell from "./AuthShell";
 import Terms from "./Terms";
 import { Brand } from "./icons";
+import { useAuth } from "@/lib/authContext";
+import { setSession } from "@/redux/features/user/userSlice";
+import { useLoginMutation, useSignupMutation } from "@/redux/api/authApi";
+import type { AuthUser } from "@/redux/type";
 
 type Field = { name: string; type: string; ph: string };
 
@@ -19,53 +24,289 @@ function GoogleG() {
   );
 }
 
+function parseApiError(err: unknown, isSignup: boolean): string {
+  if (!err) {
+    return isSignup
+      ? "Account creation failed. Please try again."
+      : "Login failed. Please try again.";
+  }
+
+  if (typeof err === "string") return err;
+
+  const e = err as {
+    status?: number | string;
+    data?: { message?: string; error?: string } | string;
+    error?: string;
+    message?: string;
+  };
+
+  // 1. Response data from backend
+  if (e.data) {
+    if (typeof e.data === "string" && e.data.trim()) return e.data;
+    if (typeof e.data.message === "string" && e.data.message.trim()) {
+      return e.data.message;
+    }
+    if (typeof e.data.error === "string" && e.data.error.trim()) {
+      return e.data.error;
+    }
+  }
+
+  // 2. Network connectivity / server waking up
+  if (
+    e.status === "FETCH_ERROR" ||
+    (typeof e.error === "string" && e.error.includes("Failed to fetch"))
+  ) {
+    return "Cannot reach the API server. If the backend is hosted on a free cloud service (like Render), it may take ~40 seconds to spin up. Please wait a moment and try again.";
+  }
+
+  if (e.status === 404) {
+    return "API route not found (404). Please verify that the backend server is reachable and properly configured.";
+  }
+
+  if (e.status === 409) {
+    return "An account with this email already exists. Please sign in or use a different email.";
+  }
+
+  if (e.status === 401) {
+    return "Invalid email or password. Please verify your credentials.";
+  }
+
+  if (e.status === 403) {
+    return "Access denied. This account has been blocked or restricted.";
+  }
+
+  if (e.status === 500) {
+    return "The server encountered an internal error. Please try again later.";
+  }
+
+  if (typeof e.error === "string" && e.error.trim()) {
+    return e.error;
+  }
+
+  if (typeof e.message === "string" && e.message.trim()) {
+    return e.message;
+  }
+
+  return isSignup
+    ? "Failed to create account due to an error. Please try again."
+    : "Failed to sign in due to an error. Please try again.";
+}
+
 export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { login: setAuthContext } = useAuth();
   const signup = mode === "signup";
   const [show, setShow] = useState(false);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const fields: Field[] = signup
-    ? [{ name: "name", type: "text", ph: "Enter your name" }, { name: "email", type: "email", ph: "Enter an email address" },
-       { name: "password", type: "password", ph: "Enter a password" }, { name: "confirm", type: "password", ph: "Enter confirm password" }]
-    : [{ name: "email", type: "email", ph: "Enter your email" }, { name: "password", type: "password", ph: "Enter your password" }];
 
-  const go = () => { setBusy(true); setTimeout(() => router.push("/dashboard"), 500); };
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [loginApi, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [signupApi, { isLoading: isSignupLoading }] = useSignupMutation();
+
+  const busy = isLoginLoading || isSignupLoading;
+
+  const fields: Field[] = signup
+    ? [
+        { name: "name", type: "text", ph: "Enter your full name" },
+        { name: "email", type: "email", ph: "Enter your email address" },
+        { name: "password", type: "password", ph: "Enter a secure password (min 6 characters)" },
+        { name: "confirm", type: "password", ph: "Confirm your password" },
+      ]
+    : [
+        { name: "email", type: "email", ph: "Enter your registered email" },
+        { name: "password", type: "password", ph: "Enter your password" },
+      ];
+
+  const handleSession = (token: string, user: AuthUser) => {
+    setAuthContext(token, user);
+    dispatch(setSession({ token, user }));
+    router.push(user.role === "admin" ? "/admin/users" : "/dashboard");
+  };
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     const d = new FormData(e.currentTarget);
-    if (signup && d.get("password") !== d.get("confirm")) { setError("Passwords do not match."); return; }
-    setError(""); go();
+    const name = String(d.get("name") ?? "").trim();
+    const email = String(d.get("email") ?? "").trim().toLowerCase();
+    const pwd = String(d.get("password") ?? "");
+    const confirm = String(d.get("confirm") ?? "");
+
+    if (signup && !name) {
+      const msg = "Please enter your name.";
+      setError(msg);
+      if (typeof window !== "undefined") window.alert(msg);
+      return;
+    }
+
+    if (!email) {
+      const msg = "Please enter a valid email address.";
+      setError(msg);
+      if (typeof window !== "undefined") window.alert(msg);
+      return;
+    }
+
+    if (signup && pwd.length < 6) {
+      const msg = "Password must be at least 6 characters long.";
+      setError(msg);
+      if (typeof window !== "undefined") window.alert(msg);
+      return;
+    }
+
+    if (signup && pwd !== confirm) {
+      const msg = "Passwords do not match. Please verify and re-type.";
+      setError(msg);
+      if (typeof window !== "undefined") window.alert(msg);
+      return;
+    }
+
+    try {
+      if (signup) {
+        const res = await signupApi({
+          name,
+          email,
+          password: pwd,
+        }).unwrap();
+        handleSession(res.token, res.user);
+      } else {
+        const res = await loginApi({
+          email,
+          password: pwd,
+        }).unwrap();
+        handleSession(res.token, res.user);
+      }
+    } catch (err: unknown) {
+      const errorMsg = parseApiError(err, signup);
+      setError(errorMsg);
+      if (typeof window !== "undefined") {
+        try {
+          window.alert(errorMsg);
+        } catch {}
+      }
+    }
+  };
+
+  const handleGoogleClick = () => {
+    const msg = "Google Sign-In is only enabled when Google OAuth is configured. Please sign in with email and password.";
+    setError(msg);
+    if (typeof window !== "undefined") {
+      try {
+        window.alert(msg);
+      } catch {}
+    }
   };
 
   return (
     <AuthShell>
-      <form onSubmit={submit} className="animate-scale-in w-full max-w-md space-y-4 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]">
-        <Link href="/" aria-label="StockSense home" className="mb-2 flex justify-center lg:hidden"><Brand /></Link>
+      <form
+        onSubmit={submit}
+        className="animate-scale-in w-full max-w-md space-y-4 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
+      >
+        <Link
+          href="/"
+          aria-label="StockSense home"
+          className="mb-2 flex justify-center lg:hidden"
+        >
+          <Brand />
+        </Link>
         <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold">{signup ? "Create Account" : "Welcome back!"}</h1>
-          <p className="text-xs text-mute">{signup ? "Please provide your required information to create an account" : "Already have an account? Please enter your email & password to log in"}</p>
+          <h1 className="text-2xl font-bold">
+            {signup ? "Create Account" : "Welcome back!"}
+          </h1>
+          <p className="text-xs text-mute">
+            {signup
+              ? "Please provide your required information to create an account"
+              : "Already have an account? Please enter your email & password to log in"}
+          </p>
         </div>
         <div className="space-y-3 pt-2">
           {fields.map((f) => (
             <div key={f.name} className="relative">
-              <input name={f.name} aria-label={f.ph} placeholder={f.ph} required minLength={f.type === "password" ? 6 : undefined}
-                type={f.type === "password" && show ? "text" : f.type} autoComplete={f.type === "password" ? (signup ? "new-password" : "current-password") : f.type === "email" ? "email" : "name"}
-                className="input !border-gold/20 !py-3 !pr-14" />
+              <input
+                name={f.name}
+                aria-label={f.ph}
+                placeholder={f.ph}
+                required
+                minLength={f.type === "password" ? 6 : undefined}
+                type={f.type === "password" && show ? "text" : f.type}
+                autoComplete={
+                  f.type === "password"
+                    ? signup
+                      ? "new-password"
+                      : "current-password"
+                    : f.type === "email"
+                    ? "email"
+                    : "name"
+                }
+                className="input !border-gold/20 !py-3 !pr-14"
+              />
               {f.type === "password" && f.name === "password" && (
-                <button type="button" onClick={() => setShow(!show)} aria-pressed={show} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mute transition hover:text-gold">{show ? "Hide" : "Show"}</button>
+                <button
+                  type="button"
+                  onClick={() => setShow(!show)}
+                  aria-pressed={show}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mute transition hover:text-gold"
+                >
+                  {show ? "Hide" : "Show"}
+                </button>
               )}
             </div>
           ))}
         </div>
-        {error && <p role="alert" className="text-center text-sm text-down">{error}</p>}
-        <button className="btn-gold w-full !py-3" type="submit" disabled={busy}>{busy ? "Please wait..." : signup ? "Create Account" : "Log In"}</button>
-        {!signup && <Link href="/forgot-password" className="block text-center text-sm text-gold transition hover:underline">Forgot Password?</Link>}
-        <div className="flex items-center gap-3 text-xs text-mute"><span className="h-px flex-1 bg-line" />or<span className="h-px flex-1 bg-line" /></div>
-        {/* Demo only: Google sign-in is connected when the backend is added */}
-        <button type="button" onClick={go} className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-3 text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98]"><GoogleG />Continue With Google</button>
-        <Link href={signup ? "/login" : "/signup"} className="block rounded-lg border border-gold/40 py-3 text-center text-sm font-medium text-gold transition duration-200 hover:bg-gold/10 active:scale-[0.98]">{signup ? "Log In" : "Create Account"}</Link>
-        {!signup && <p className="text-center text-xs"><Link href="/dashboard" className="text-mute transition hover:text-white">Try demo without an account</Link></p>}
+
+        {error && (
+          <div role="alert" className="animate-fade-up rounded-xl border border-down/40 bg-down/15 p-3.5 text-sm text-down">
+            <div className="flex items-start gap-2.5">
+              <span className="shrink-0 text-base">⚠️</span>
+              <div className="flex-1 leading-snug">
+                <strong className="block font-semibold">
+                  {signup ? "Account Creation Failed" : "Sign In Failed"}
+                </strong>
+                <span className="text-xs text-white/90">{error}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          className="btn-gold w-full !py-3 disabled:cursor-not-allowed disabled:opacity-50"
+          type="submit"
+          disabled={busy}
+        >
+          {busy ? "Please wait..." : signup ? "Create Account" : "Log In"}
+        </button>
+
+        {!signup && (
+          <Link
+            href="/forgot-password"
+            className="block text-center text-sm text-gold transition hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        )}
+
+        <div className="flex items-center gap-3 text-xs text-mute">
+          <span className="h-px flex-1 bg-line" />
+          or
+          <span className="h-px flex-1 bg-line" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleClick}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-3 text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98]"
+        >
+          <GoogleG />
+          Continue With Google
+        </button>
+
+        <Link
+          href={signup ? "/login" : "/signup"}
+          className="block rounded-lg border border-gold/40 py-3 text-center text-sm font-medium text-gold transition duration-200 hover:bg-gold/10 active:scale-[0.98]"
+        >
+          {signup ? "Log In" : "Create Account"}
+        </Link>
+
         <Terms />
       </form>
     </AuthShell>

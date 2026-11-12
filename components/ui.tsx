@@ -1,4 +1,4 @@
-import type { Signal } from "@/lib/mockData";
+import type { Signal } from "@/redux/type";
 import { glossary } from "@/lib/glossary";
 
 export const usd = (n: number) => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });

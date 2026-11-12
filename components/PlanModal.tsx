@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { Plan } from "@/lib/plans";
+import type { Plan } from "@/redux/type";
 import Switch from "./Switch";
 import { Icon } from "./icons";
 

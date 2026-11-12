@@ -1,4 +1,4 @@
-import type { AlertItem, AlertKind, Signal } from "./mockData";
+import type { AlertItem, AlertKind, Signal } from "@/redux/type";
 
 export type AlertConfig = { price?: number; breakout?: number; signal?: Signal; volume?: number; email: boolean; push: boolean; discord: boolean };
 

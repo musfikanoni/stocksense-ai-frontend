@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { planSeed } from "@/lib/plans";
 import { Brand, Icon } from "@/components/icons";
 import ContactModal from "@/components/ContactModal";
+import LandingPricing from "@/components/LandingPricing";
 
 const nav = [["Home", "#home"], ["Feature", "#feature"], ["Review", "#review"], ["Pricing", "#pricing"], ["Contact", "#contact"]];
 const stats = [["15K+", "Active Traders"], ["500K+", "Signals Delivered"], ["125K+", "Levels Generated"], ["92%", "Accuracy Percentage"]];
@@ -48,8 +48,8 @@ export default function Landing() {
             <h1 className="text-4xl font-bold leading-tight sm:text-6xl">Trade With <span className="text-gold">Precision</span> Intelligence</h1>
             <p className="mx-auto mt-6 max-w-2xl text-white/80">StockSense delivers institutional-grade AI analysis for US equities — real-time signals, support/resistance mapping, and price targets with confidence scoring.</p>
             <div className="mt-8 flex justify-center gap-3">
-              <Link href="/signup" className="btn-gold inline-flex items-center gap-2">Get Start <Icon name="arrow" /></Link>
-              <Link href="/dashboard" className="btn-outline !py-2.5">Try demo</Link>
+              <Link href="/signup" className="btn-gold inline-flex items-center gap-2">Get Started <Icon name="arrow" /></Link>
+              <Link href="/login" className="btn-outline !py-2.5">Sign In</Link>
             </div>
           </div>
           <div className="relative mx-auto mt-14 max-w-5xl animate-fade-up px-6 [animation-delay:200ms]">
@@ -103,21 +103,7 @@ export default function Landing() {
         <section id="pricing" className="mx-auto max-w-3xl px-6 py-20 text-center">
           <Title a="Choose Your" b="Plan" />
           <p className="mb-10 mt-3 text-white/70">Upgrade to unlock full AI analysis</p>
-          <div className="grid gap-5 text-left sm:grid-cols-2">
-            {planSeed.map((p) => (
-              <div key={p.id} className={`reveal card-hover relative flex flex-col overflow-hidden rounded-2xl border p-6 ${p.highlight ? "border-gold/60" : "border-line bg-gradient-to-b from-[#1a1a1a] to-[#0d0d0d]"}`}>
-                {p.highlight && <Image src="/landing/premium-bg.webp" alt="" fill sizes="400px" className="object-cover" />}
-                <div className="relative flex flex-1 flex-col">
-                  <h3 className={`flex items-center gap-2 font-semibold ${p.highlight ? "text-gold" : ""}`}>{p.highlight && <Icon name="bolt" />}{p.name}</h3>
-                  <p className="mt-3 border-b border-white/10 pb-4 text-3xl font-bold">{p.price}$<span className="text-sm font-normal text-mute">/month</span></p>
-                  <ul className="my-5 flex-1 space-y-2.5 text-sm">
-                    {p.features.map((f) => (<li key={f} className="flex items-center gap-2"><Icon name="check" className={`h-4 w-4 shrink-0 ${p.highlight ? "text-gold" : "text-white"}`} />{f}</li>))}
-                  </ul>
-                  <Link href="/signup" className={p.highlight ? "btn-gold block text-center" : "block rounded-lg bg-white/10 py-2.5 text-center text-sm font-semibold text-mute transition hover:bg-white/15"}>{p.highlight ? "Upgrade to Premium" : "Current Plan"}</Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          <LandingPricing />
         </section>
       </main>
 
@@ -129,7 +115,7 @@ export default function Landing() {
             <span className="flex items-center gap-2"><Icon name="mail" />example123@gmail.com</span>
             <span className="flex items-center gap-2"><Icon name="phone" />+1234567854</span>
           </div>
-          <p className="text-xs">&copy; 2026 StockSense. All rights reserved. <Link href="/admin" className="ml-2 underline transition hover:text-white">Admin demo</Link></p>
+          <p className="text-xs">&copy; 2026 StockSense. All rights reserved.</p>
         </div>
       </footer>
     </>

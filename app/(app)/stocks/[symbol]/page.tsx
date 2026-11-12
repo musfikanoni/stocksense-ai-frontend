@@ -2,11 +2,19 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { useGetHistoryQuery, useGetStockQuery } from "@/store/api";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { alertsSlice, watchlistSlice } from "@/store/slices";
-import { configToAlerts } from "@/lib/alerts";
-import { levels, marketBias, pct, reasonFor, score, type Range } from "@/lib/mockData";
+import {
+  useGetHistoryQuery,
+  useGetStockQuery,
+  useGetMarketBiasQuery,
+  useGetStockSummaryQuery,
+} from "@/redux/api/stocksApi";
+import {
+  useGetWatchlistQuery,
+  useAddToWatchlistMutation,
+  useRemoveFromWatchlistMutation,
+} from "@/redux/api/watchlistApi";
+import { useCreateAlertMutation } from "@/redux/api/alertsApi";
+import type { AlertConfig } from "@/lib/alerts";
 import ConfidenceRing from "@/components/ConfidenceRing";
 import AlertModal from "@/components/AlertModal";
 import CompanyLogo from "@/components/CompanyLogo";
@@ -14,18 +22,51 @@ import Tip from "@/components/Tip";
 import { Icon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton";
 import { Change, signalTone, usd } from "@/components/ui";
+import type { Range, Signal } from "@/redux/type";
 
 const ranges: Range[] = ["1D", "1W", "1M", "1Y"];
 
 export default function StockPage() {
   const { symbol } = useParams<{ symbol: string }>();
-  const dispatch = useAppDispatch();
-  const inList = useAppSelector((s) => s.watchlist.includes(symbol.toUpperCase()));
   const [range, setRange] = useState<Range>("1M");
   const [alertOpen, setAlertOpen] = useState(false);
   const [note, setNote] = useState("");
+
   const { data: stock, isLoading, isError } = useGetStockQuery(symbol);
   const { data: hist = [] } = useGetHistoryQuery({ symbol, range });
+  const { data: marketBias = [] } = useGetMarketBiasQuery();
+  const { data: summary } = useGetStockSummaryQuery(symbol, { skip: !stock || stock.price === null });
+  const { data: watchlist = [] } = useGetWatchlistQuery();
+  const [addToWatchlist] = useAddToWatchlistMutation();
+  const [removeFromWatchlist] = useRemoveFromWatchlistMutation();
+  const [createAlert] = useCreateAlertMutation();
+
+  const inList = watchlist.some((s) => s.symbol === symbol.toUpperCase());
+
+  const toggleWatchlist = async () => {
+    try {
+      if (inList) await removeFromWatchlist(symbol.toUpperCase()).unwrap();
+      else await addToWatchlist(symbol.toUpperCase()).unwrap();
+    } catch (e: unknown) {
+      setNote((e as { data?: { message?: string } })?.data?.message ?? "Could not update watchlist.");
+    }
+  };
+
+  const handleAlert = async (c: AlertConfig) => {
+    if (!stock) return;
+    const conditions: Record<string, unknown> = {};
+    if (c.price !== undefined) conditions.price = c.price;
+    if (c.breakout !== undefined) conditions.breakout = c.breakout;
+    if (c.signal !== undefined) conditions.signal = c.signal;
+    if (c.volume !== undefined) conditions.volume = c.volume;
+    try {
+      await createAlert({ symbol: stock.symbol, conditions: conditions as Parameters<typeof createAlert>[0]["conditions"], channels: { email: c.email, push: c.push, discord: c.discord } }).unwrap();
+      setAlertOpen(false);
+      setNote(`Alert set for ${stock.symbol}. You can manage it on the Alerts page.`);
+    } catch (e: unknown) {
+      setNote((e as { data?: { message?: string } })?.data?.message ?? "Could not create alert.");
+    }
+  };
 
   if (isLoading) return (
     <div className="space-y-6"><Skeleton className="h-20" />
@@ -34,15 +75,14 @@ export default function StockPage() {
   );
   if (isError || !stock) return <p className="text-down">We could not find {symbol.toUpperCase()}. Try a symbol like AAPL or MSFT.</p>;
 
-  const lv = levels(stock);
-  const sc = score(stock);
-  const p = pct(stock);
-  const up = stock.change >= 0;
+  const sc = stock.confidence ?? 0;
+  const p = stock.changePct ?? 0;
+  const up = (stock.change ?? 0) >= 0;
   const rows = [
-    { label: "Support", v: lv.support, dot: "bg-up", text: "text-up", tip: true },
-    { label: "Resistance", v: lv.resistance, dot: "bg-down", text: "text-down", tip: true },
-    { label: "Breakout", v: lv.breakout, dot: "bg-blue-400", text: "text-blue-400" },
-    { label: "AI Target (30d)", v: lv.target, dot: "bg-gold", text: "text-gold" },
+    { label: "Support", v: stock.support, dot: "bg-up", text: "text-up", tip: true },
+    { label: "Resistance", v: stock.resistance, dot: "bg-down", text: "text-down", tip: true },
+    { label: "Breakout", v: stock.breakout, dot: "bg-blue-400", text: "text-blue-400" },
+    { label: "AI Target (30d)", v: stock.target, dot: "bg-gold", text: "text-gold" },
   ];
 
   return (
@@ -52,18 +92,20 @@ export default function StockPage() {
           <CompanyLogo symbol={stock.symbol} size={64} />
           <div>
             <h1 className="text-2xl font-bold">{stock.symbol} <span className="font-normal text-mute">({stock.name})</span></h1>
-            <p className="text-sm text-mute">{stock.exchange} <span className="text-up">&bull; Open Market</span></p>
+            <p className="text-sm text-mute">{stock.exchange} <span className="text-up">• {stock.marketOpen ? "Open Market" : "Market Closed"}</span></p>
           </div>
         </div>
         <div className="text-right">
           <div className="mb-2 flex justify-end gap-3">
-            <button onClick={() => dispatch(inList ? watchlistSlice.actions.remove(stock.symbol) : watchlistSlice.actions.add(stock.symbol))}
-              className="btn-gold flex items-center gap-2 !px-4 !py-2 text-sm"><Icon name="bookmark" />{inList ? "In Watchlist" : "Add to Watchlist"}</button>
+            <button onClick={toggleWatchlist} className="btn-gold flex items-center gap-2 !px-4 !py-2 text-sm">
+              <Icon name="bookmark" />{inList ? "In Watchlist" : "Add to Watchlist"}
+            </button>
             <button onClick={() => setAlertOpen(true)} className="btn-outline flex items-center gap-2 !py-2"><Icon name="bell" />Set Alert</button>
           </div>
-          <p className="text-3xl font-bold">{usd(stock.price)}</p>
-          <p className="text-sm"><Change v={stock.change} /> <span className={up ? "text-up" : "text-down"}>({up ? "+" : ""}{p.toFixed(2)}%)</span></p>
-          <p className="text-xs text-mute">Volume {stock.volume}</p>
+          <p className="text-3xl font-bold">{stock.price ? usd(stock.price) : "—"}</p>
+          <p className="text-sm">{stock.change !== null ? <Change v={stock.change} /> : "—"} <span className={up ? "text-up" : "text-down"}>({up ? "+" : ""}{p.toFixed(2)}%)</span></p>
+          <p className="text-xs text-mute">Volume {stock.volume ?? "—"}</p>
+          {stock.dataSource === "simulated" && <p className="mt-1 text-xs text-gold/70">⚠ Simulated prices</p>}
         </div>
       </div>
       {note && <p role="status" className="animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-sm text-up">{note}</p>}
@@ -72,20 +114,22 @@ export default function StockPage() {
         <section className="card">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-semibold"><Icon name="pulse" className="h-4 w-4 text-gold" />AI Signal</h2>
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${signalTone[stock.signal]}`}>{stock.signal} ({sc >= 75 ? "Strong" : "Moderate"})</span>
+            {stock.signal && <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${signalTone[stock.signal]}`}>{stock.signal} ({sc >= 75 ? "Strong" : "Moderate"})</span>}
           </div>
           <p className="mb-3 text-center text-xs text-mute"><Tip term="Confidence">Confidence Score &amp; Reason</Tip></p>
           <div className="flex justify-center"><ConfidenceRing value={sc} size={110} /></div>
-          <p className="mt-4 text-center text-xs text-mute">{reasonFor(stock)}</p>
+          {summary
+            ? <p className="mt-4 text-center text-xs text-mute">{summary.summary}</p>
+            : stock.reason && <p className="mt-4 text-center text-xs text-mute">{stock.reason}</p>}
         </section>
 
         <section className="card">
           <h2 className="mb-4 flex items-center gap-2 font-semibold"><Icon name="target" className="h-4 w-4 text-gold" />AI Levels</h2>
           <ul className="space-y-3 text-sm">
-            {rows.map((r) => (
-              <li key={r.label} className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-mute"><span className={`h-2 w-2 rounded-full ${r.dot}`} />{r.tip ? <Tip term={r.label}>{r.label}</Tip> : r.label}</span>
-                <span className={`font-semibold ${r.text}`}>{usd(r.v)}</span>
+            {rows.map((row) => (
+              <li key={row.label} className="flex items-center justify-between">
+                <span className="flex items-center gap-2 text-mute"><span className={`h-2 w-2 rounded-full ${row.dot}`} />{row.tip ? <Tip term={row.label}>{row.label}</Tip> : row.label}</span>
+                <span className={`font-semibold ${row.text}`}>{row.v ? usd(row.v) : "—"}</span>
               </li>
             ))}
             <li className="flex items-center justify-between">
@@ -99,9 +143,9 @@ export default function StockPage() {
           <h2 className="mb-4 flex items-center gap-2 font-semibold"><Icon name="trend" className="h-4 w-4 text-gold" />Market Bias</h2>
           <ul className="space-y-2">
             {marketBias.map((m) => (
-              <li key={m.symbol} className={`flex items-center justify-between rounded-lg px-3 py-2 ${signalTone[m.signal]}`}>
+              <li key={m.symbol} className={`flex items-center justify-between rounded-lg px-3 py-2 ${m.signal ? signalTone[m.signal as Signal] : "bg-line/20 text-mute"}`}>
                 <span><b className="block text-sm text-white">{m.symbol}</b><span className="text-xs opacity-70">{m.name}</span></span>
-                <span className="text-right"><b className="block text-sm">{m.signal}</b><span className="text-xs opacity-70">{m.pct}%</span></span>
+                <span className="text-right"><b className="block text-sm">{m.signal ?? "—"}</b><span className="text-xs opacity-70">{m.pct ?? 0}%</span></span>
               </li>
             ))}
           </ul>
@@ -111,7 +155,8 @@ export default function StockPage() {
       <section className="card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-3 font-semibold">{stock.symbol} - Stock Chart
-            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${up ? "bg-up/15 text-up" : "bg-down/15 text-down"}`}>{up ? "+" : ""}{p.toFixed(2)}% today</span></h2>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${up ? "bg-up/15 text-up" : "bg-down/15 text-down"}`}>{up ? "+" : ""}{p.toFixed(2)}% today</span>
+          </h2>
           <div className="flex gap-2" role="group" aria-label="Chart range">
             {ranges.map((r) => (
               <button key={r} aria-pressed={range === r} onClick={() => setRange(r)}
@@ -133,10 +178,7 @@ export default function StockPage() {
         </div>
       </section>
 
-      {alertOpen && (
-        <AlertModal symbol={stock.symbol} mode="create" basePrice={stock.price} onClose={() => setAlertOpen(false)}
-          onSubmit={(c) => { dispatch(alertsSlice.actions.addMany(configToAlerts(stock.symbol, c))); setAlertOpen(false); setNote(`Alert set for ${stock.symbol}. You can manage it on the Alerts page.`); }} />
-      )}
+      {alertOpen && <AlertModal symbol={stock.symbol} mode="create" basePrice={stock.price ?? 241} onClose={() => setAlertOpen(false)} onSubmit={handleAlert} />}
     </div>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
-import { Provider } from "react-redux";
-import { store } from "@/store/store";
+import ReduxProvider from "@/redux/Provider";
+import { AuthProvider } from "@/lib/authContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <ReduxProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ReduxProvider>
+  );
 }

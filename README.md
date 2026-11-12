@@ -19,8 +19,8 @@ Open http://localhost:3000
 (Write this in your own words after each step.)
 
 ## Data layer
-All data comes from `lib/mockData.ts` through RTK Query (`store/api.ts`).
-When the backend is ready, only `store/api.ts` changes (fakeBaseQuery -> fetchBaseQuery).
+All data is served dynamically from the real-world StockSense API backend via Redux Toolkit and RTK Query (`redux/api/`).
+Endpoints include authentication, stocks, watchlists, alerts, pricing plans, dashboard metrics, and administrative features.
 
 ## About the project (plain English)
 StockSense helps people follow stocks. A user saves stocks to a watchlist, sees an AI-style

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { Signal } from "@/lib/mockData";
+import type { Signal } from "@/redux/type";
 import type { AlertConfig } from "@/lib/alerts";
 
 type Props = { symbol: string; mode: "create" | "edit"; basePrice?: number; initial?: AlertConfig; onSubmit: (c: AlertConfig) => void; onClose: () => void };
