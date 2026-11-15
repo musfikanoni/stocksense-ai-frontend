@@ -26,15 +26,6 @@ interface ReviewCardItem {
   avatar?: string;
 }
 
-const defaultReviews: ReviewCardItem[] = [
-  { q: "The AI signals have completely transformed my trading. Up 34% this quarter following the setups.", n: "Samantha Patel", r: "Day Trader", rating: 5 },
-  { q: "I never thought I could automate my strategies this efficiently. 20% increase in profitability!", n: "Marcus Chen", r: "Swing Trader", rating: 5 },
-  { q: "The insights provided by AI are invaluable, helping me make more informed decisions in real-time.", n: "David Kim", r: "Options Trader", rating: 5 },
-  { q: "AI tools have transformed my workflow, allowing for greater efficiency and accuracy in my analyses.", n: "Sarah Chen", r: "Data Analyst", rating: 5 },
-  { q: "With AI's predictive capabilities, I can anticipate market moves and adjust my strategies accordingly.", n: "John Doe", r: "Financial Consultant", rating: 5 },
-  { q: "The alerts catch breakouts I would have missed while working on my research.", n: "Aisha Patel", r: "Market Researcher", rating: 5 },
-];
-
 const Title = ({ a, b, c }: { a?: string; b: string; c?: string }) => (
   <h2 className="text-3xl font-bold sm:text-4xl">{a} <span className="text-gold">{b}</span> {c}</h2>
 );
@@ -59,10 +50,7 @@ export default function Landing() {
     avatar: r.avatarUrl,
   }));
 
-  const displayReviews: ReviewCardItem[] =
-    formattedDynamic.length > 0
-      ? [...formattedDynamic, ...defaultReviews]
-      : defaultReviews;
+  const displayReviews: ReviewCardItem[] = formattedDynamic;
 
   return (
     <>
@@ -139,13 +127,14 @@ export default function Landing() {
         <section id="review" className="py-16 text-center">
           <Title a="Trusted By" b="Traders" />
           <p className="mb-10 mt-3 text-white/70">Helping traders make smarter decisions with intelligent market insights.</p>
-          <div className="group overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-            <div className="flex w-max animate-marquee gap-5 [animation-duration:70s] group-hover:[animation-play-state:paused]">
-              {[...displayReviews, ...displayReviews].map((r, i) => (
+          {displayReviews.length === 0 ? (
+            <p className="text-sm text-mute">No reviews yet.</p>
+          ) : displayReviews.length < 4 ? (
+            <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-6 px-6 text-left">
+              {displayReviews.map((r, i) => (
                 <figure
                   key={i}
-                  aria-hidden={i >= displayReviews.length}
-                  className="flex min-h-[210px] w-[340px] flex-col justify-between rounded-2xl border border-line bg-gradient-to-b from-[#121009] to-black p-6 text-left"
+                  className="flex min-h-[210px] w-full max-w-[340px] flex-col justify-between rounded-2xl border border-line bg-gradient-to-b from-[#121009] to-black p-6"
                 >
                   <p className="text-gold tracking-wide" aria-label={`${r.rating || 5} out of 5 stars`}>
                     {"★".repeat(r.rating || 5)}
@@ -164,7 +153,34 @@ export default function Landing() {
                 </figure>
               ))}
             </div>
-          </div>
+          ) : (
+            <div className="group overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
+              <div className="flex w-max animate-marquee gap-5 [animation-duration:70s] group-hover:[animation-play-state:paused]">
+                {[...displayReviews, ...displayReviews].map((r, i) => (
+                  <figure
+                    key={i}
+                    aria-hidden={i >= displayReviews.length}
+                    className="flex min-h-[210px] w-[340px] flex-col justify-between rounded-2xl border border-line bg-gradient-to-b from-[#121009] to-black p-6 text-left"
+                  >
+                    <p className="text-gold tracking-wide" aria-label={`${r.rating || 5} out of 5 stars`}>
+                      {"★".repeat(r.rating || 5)}
+                      {"☆".repeat(Math.max(0, 5 - (r.rating || 5)))}
+                    </p>
+                    <blockquote className="my-3 text-sm text-white/80 leading-relaxed line-clamp-4">
+                      &ldquo;{r.q}&rdquo;
+                    </blockquote>
+                    <figcaption className="flex items-center gap-3 pt-2 border-t border-white/5">
+                      <Avatar name={r.n} url={r.avatar} size={34} />
+                      <div className="min-w-0 flex-1">
+                        <b className="block truncate text-xs text-white">{r.n}</b>
+                        <span className="block truncate text-[11px] text-mute">{r.r}</span>
+                      </div>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section id="pricing" className="mx-auto max-w-3xl px-6 py-20 text-center">

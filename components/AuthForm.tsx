@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -9,7 +9,11 @@ import Terms from "./Terms";
 import { Brand } from "./icons";
 import { useAuth } from "@/lib/authContext";
 import { setSession } from "@/redux/features/user/userSlice";
-import { useLoginMutation, useSignupMutation } from "@/redux/api/authApi";
+import {
+  useLoginMutation,
+  useSignupMutation,
+  useGoogleAuthMutation,
+} from "@/redux/api/authApi";
 import type { AuthUser } from "@/redux/type";
 
 type Field = { name: string; type: string; ph: string };
@@ -106,8 +110,9 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   const [loginApi, { isLoading: isLoginLoading }] = useLoginMutation();
   const [signupApi, { isLoading: isSignupLoading }] = useSignupMutation();
+  const [googleAuthApi, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
 
-  const busy = isLoginLoading || isSignupLoading;
+  const busy = isLoginLoading || isSignupLoading || isGoogleLoading;
 
   const fields: Field[] = signup
     ? [
@@ -188,10 +193,86 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
   };
 
+  const handleCredentialResponse = async (response: { credential?: string }) => {
+    if (!response.credential) {
+      toast.error("Google sign-in did not return a valid credential.");
+      return;
+    }
+    setError("");
+    try {
+      const res = await googleAuthApi({ credential: response.credential }).unwrap();
+      toast.success("Signed in with Google successfully!");
+      handleSession(res.token, res.user);
+    } catch (err: unknown) {
+      const errorMsg = parseApiError(err, false);
+      setError(errorMsg);
+      toast.error(errorMsg);
+    }
+  };
+
+  useEffect(() => {
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      "1068876994935-ungitm215r12krguq217sisdr7cp4en5.apps.googleusercontent.com";
+
+    const initGsi = () => {
+      const google = (window as any).google;
+      if (!google?.accounts?.id) return;
+
+      try {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        const btnContainer = document.getElementById("google-btn-wrapper");
+        if (btnContainer) {
+          btnContainer.innerHTML = "";
+          google.accounts.id.renderButton(btnContainer, {
+            theme: "outline",
+            size: "large",
+            width: 350,
+            text: "continue_with",
+            shape: "rectangular",
+          });
+        }
+      } catch (e) {
+        console.error("Google Identity Services initialization failed:", e);
+      }
+    };
+
+    if ((window as any).google?.accounts?.id) {
+      initGsi();
+    } else {
+      const existingScript = document.getElementById("google-gsi-script");
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.id = "google-gsi-script";
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initGsi;
+        document.body.appendChild(script);
+      } else {
+        existingScript.addEventListener("load", initGsi);
+      }
+    }
+  }, []);
+
   const handleGoogleClick = () => {
-    const msg = "Google Sign-In is only enabled when Google OAuth is configured. Please sign in with email and password.";
-    setError(msg);
-    toast.info(msg);
+    const btn = document.querySelector("#google-btn-wrapper div[role=button], #google-btn-wrapper iframe") as HTMLElement;
+    if (btn) {
+      btn.click();
+      return;
+    }
+    const google = (window as any).google;
+    if (google?.accounts?.id) {
+      google.accounts.id.prompt();
+    } else {
+      toast.info("Google services are loading. Please try again in a moment.");
+    }
   };
 
   return (
@@ -289,14 +370,22 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <span className="h-px flex-1 bg-line" />
         </div>
 
-        <button
-          type="button"
-          onClick={handleGoogleClick}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-3 text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98]"
-        >
-          <GoogleG />
-          Continue With Google
-        </button>
+        <div className="relative w-full">
+          <button
+            type="button"
+            onClick={handleGoogleClick}
+            disabled={busy}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-3 text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+          >
+            <GoogleG />
+            {isGoogleLoading ? "Connecting to Google..." : "Continue With Google"}
+          </button>
+          <div
+            id="google-btn-wrapper"
+            className="absolute inset-0 z-10 flex items-center justify-center opacity-0 overflow-hidden cursor-pointer"
+            aria-label="Google Sign In"
+          />
+        </div>
 
         <Link
           href={signup ? "/login" : "/signup"}
