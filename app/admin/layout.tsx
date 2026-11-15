@@ -6,6 +6,7 @@ import AuthGuard from "@/components/AuthGuard";
 const items = [
   { label: "User Management", href: "/admin/users", icon: "users" },
   { label: "Plan Management", href: "/admin/plans", icon: "tag" },
+  { label: "Review Management", href: "/admin/reviews", icon: "star" },
   { label: "Revenue & Billing Info", href: "/admin/billing", icon: "wallet" },
   { label: "Edit Policy & Agreement", href: "/admin/policy", icon: "doc" },
   { label: "Admin Settings", href: "/admin/settings", icon: "gear" },

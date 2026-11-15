@@ -17,6 +17,7 @@ import { useGetAdminNotificationsQuery } from "@/redux/api/adminApi";
 const titles: [string, string][] = [
   ["/admin/users", "User Management"],
   ["/admin/plans", "Plan Management"],
+  ["/admin/reviews", "Review Management"],
   ["/admin/billing", "Revenue & Billing Info"],
   ["/admin/policy", "Edit Policy & Agreement"],
   ["/admin/settings", "Admin Settings"],
@@ -73,8 +74,12 @@ export default function Topbar() {
 
   const unread = userNotif?.unread ?? 0;
   const notifList = admin
-    ? (adminNotif ?? []).map((n) => ({ text: n.text, time: new Date(n.at).toLocaleDateString() }))
-    : (userNotif?.items ?? []).map((n) => ({ text: n.text, time: new Date(n.createdAt).toLocaleTimeString() }));
+    ? (adminNotif ?? []).map((n) => ({ title: "", text: n.text, time: new Date(n.at).toLocaleDateString() }))
+    : (userNotif?.items ?? []).map((n) => ({
+        title: n.title || "",
+        text: n.body || n.text || "",
+        time: new Date(n.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      }));
 
   useEffect(() => {
     const click = (e: MouseEvent) => {
@@ -274,7 +279,8 @@ export default function Topbar() {
                 <ul className="max-h-72 divide-y divide-line overflow-y-auto">
                   {notifList.map((n, i) => (
                     <li key={i} className="py-2.5 text-xs leading-relaxed">
-                      <p className="text-white/90">{n.text}</p>
+                      {n.title && <p className="font-semibold text-white/95">{n.title}</p>}
+                      <p className="text-white/80">{n.text}</p>
                       <p className="mt-1 text-[11px] text-mute">{n.time}</p>
                     </li>
                   ))}

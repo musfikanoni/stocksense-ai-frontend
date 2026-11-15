@@ -38,6 +38,7 @@ export const baseApi = createApi({
     "AdminBilling",
     "Policy",
     "User",
+    "Reviews",
   ],
   endpoints: () => ({}),
 });

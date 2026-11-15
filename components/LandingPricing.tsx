@@ -2,11 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useGetPlansQuery } from "@/redux/api/plansApi";
+import { useAuth } from "@/lib/authContext";
 import { Icon } from "./icons";
 import Skeleton from "./Skeleton";
 
 export default function LandingPricing() {
   const { data: plans = [], isLoading } = useGetPlansQuery();
+  const { user } = useAuth();
 
   if (isLoading) {
     return (
@@ -74,7 +76,7 @@ export default function LandingPricing() {
                 ))}
               </ul>
               <Link
-                href="/signup"
+                href={user ? (p.price === 0 ? "/dashboard" : "/subscription") : "/signup"}
                 className={
                   p.highlight
                     ? "btn-gold block text-center"

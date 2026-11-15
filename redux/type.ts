@@ -108,8 +108,12 @@ export interface MarketBiasItem {
 }
 
 export interface NotificationItem {
-  _id: string;
-  text: string;
+  id?: string;
+  _id?: string;
+  title?: string;
+  body?: string;
+  text?: string;
+  symbol?: string;
   createdAt: string;
   read: boolean;
 }

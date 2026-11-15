@@ -19,13 +19,15 @@ import {
 } from "@/redux/api/billingApi";
 import { useGetPolicyQuery } from "@/redux/api/plansApi";
 import { useAuth } from "@/lib/authContext";
+import ReviewSettingsTab from "./ReviewSettingsTab";
 
-export type Tab = "profile" | "security" | "billing" | "policy";
+export type Tab = "profile" | "security" | "billing" | "policy" | "review";
 const labels: Record<Tab, string> = {
   profile: "Profile",
   security: "Security & Privacy",
   billing: "Payment & Billing",
   policy: "Policy & Agreement",
+  review: "Feedback & Review",
 };
 const note =
   "animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-center text-sm text-up";
@@ -571,6 +573,8 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
             ))}
         </div>
       )}
+
+      {tab === "review" && <ReviewSettingsTab boxClass={box} />}
 
       {confirmDel && (
         <div

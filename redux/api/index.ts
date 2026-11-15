@@ -8,4 +8,5 @@ export * from "./billingApi";
 export * from "./plansApi";
 export * from "./notificationsApi";
 export * from "./adminApi";
+export * from "./reviewsApi";
 

@@ -1,8 +1,14 @@
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Brand, Icon } from "@/components/icons";
 import ContactModal from "@/components/ContactModal";
 import LandingPricing from "@/components/LandingPricing";
+import LandingProfileMenu from "@/components/LandingProfileMenu";
+import Avatar from "@/components/Avatar";
+import { useAuth } from "@/lib/authContext";
+import { useGetPublicReviewsQuery } from "@/redux/api/reviewsApi";
 
 const nav = [["Home", "#home"], ["Feature", "#feature"], ["Review", "#review"], ["Pricing", "#pricing"], ["Contact", "#contact"]];
 const stats = [["15K+", "Active Traders"], ["500K+", "Signals Delivered"], ["125K+", "Levels Generated"], ["92%", "Accuracy Percentage"]];
@@ -12,13 +18,21 @@ const features = [
   { t: "Smart Support & Resistance", img: "support", d: "Automatically identify key price zones and potential breakout areas using intelligent analysis." },
   { t: "Real-Time Alerts", img: "alerts", d: "Instant notifications when your target stocks hit critical price levels or generate new trade signals." },
 ];
-const reviews = [
-  { q: "The AI signals have completely transformed my trading. Up 34% this quarter following the setups.", n: "Samantha Patel", r: "Day Trader" },
-  { q: "I never thought I could automate my strategies this efficiently. 20% increase in profitability!", n: "Marcus Chen", r: "Swing Trader" },
-  { q: "The insights provided by AI are invaluable, helping me make more informed decisions in real-time.", n: "David Kim", r: "Options Trader" },
-  { q: "AI tools have transformed my workflow, allowing for greater efficiency and accuracy in my analyses.", n: "Sarah Chen", r: "Data Analyst" },
-  { q: "With AI's predictive capabilities, I can anticipate market moves and adjust my strategies accordingly.", n: "John Doe", r: "Financial Consultant" },
-  { q: "The alerts catch breakouts I would have missed while working on my research.", n: "Aisha Patel", r: "Market Researcher" },
+interface ReviewCardItem {
+  q: string;
+  n: string;
+  r: string;
+  rating?: number;
+  avatar?: string;
+}
+
+const defaultReviews: ReviewCardItem[] = [
+  { q: "The AI signals have completely transformed my trading. Up 34% this quarter following the setups.", n: "Samantha Patel", r: "Day Trader", rating: 5 },
+  { q: "I never thought I could automate my strategies this efficiently. 20% increase in profitability!", n: "Marcus Chen", r: "Swing Trader", rating: 5 },
+  { q: "The insights provided by AI are invaluable, helping me make more informed decisions in real-time.", n: "David Kim", r: "Options Trader", rating: 5 },
+  { q: "AI tools have transformed my workflow, allowing for greater efficiency and accuracy in my analyses.", n: "Sarah Chen", r: "Data Analyst", rating: 5 },
+  { q: "With AI's predictive capabilities, I can anticipate market moves and adjust my strategies accordingly.", n: "John Doe", r: "Financial Consultant", rating: 5 },
+  { q: "The alerts catch breakouts I would have missed while working on my research.", n: "Aisha Patel", r: "Market Researcher", rating: 5 },
 ];
 
 const Title = ({ a, b, c }: { a?: string; b: string; c?: string }) => (
@@ -26,6 +40,30 @@ const Title = ({ a, b, c }: { a?: string; b: string; c?: string }) => (
 );
 
 export default function Landing() {
+  const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const { data: dynamicReviews } = useGetPublicReviewsQuery();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isLoggedIn = mounted && Boolean(user);
+  const dashboardHref = user?.role === "admin" ? "/admin/users" : "/dashboard";
+
+  const formattedDynamic = (dynamicReviews || []).map((r) => ({
+    q: r.comment,
+    n: r.name,
+    r: r.role,
+    rating: r.rating || 5,
+    avatar: r.avatarUrl,
+  }));
+
+  const displayReviews: ReviewCardItem[] =
+    formattedDynamic.length > 0
+      ? [...formattedDynamic, ...defaultReviews]
+      : defaultReviews;
+
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-white/5 bg-ink/70 backdrop-blur-md">
@@ -35,8 +73,14 @@ export default function Landing() {
             {nav.map(([l, h], i) => <a key={l} href={h} className={`transition hover:text-gold ${i === 0 ? "text-gold" : "text-white/80"}`}>{l}</a>)}
           </nav>
           <div className="flex items-center gap-3 text-sm">
-            <Link href="/login" className="rounded-lg border border-gold/40 px-4 py-2 font-medium text-gold transition hover:bg-gold/10">Log In</Link>
-            <Link href="/signup" className="btn-gold !px-4 !py-2">Get Start</Link>
+            {isLoggedIn ? (
+              <LandingProfileMenu />
+            ) : (
+              <>
+                <Link href="/login" className="rounded-lg border border-gold/40 px-4 py-2 font-medium text-gold transition hover:bg-gold/10">Log In</Link>
+                <Link href="/signup" className="btn-gold !px-4 !py-2">Get Start</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -48,8 +92,16 @@ export default function Landing() {
             <h1 className="text-4xl font-bold leading-tight sm:text-6xl">Trade With <span className="text-gold">Precision</span> Intelligence</h1>
             <p className="mx-auto mt-6 max-w-2xl text-white/80">StockSense delivers institutional-grade AI analysis for US equities — real-time signals, support/resistance mapping, and price targets with confidence scoring.</p>
             <div className="mt-8 flex justify-center gap-3">
-              <Link href="/signup" className="btn-gold inline-flex items-center gap-2">Get Started <Icon name="arrow" /></Link>
-              <Link href="/login" className="btn-outline !py-2.5">Sign In</Link>
+              {isLoggedIn ? (
+                <Link href={dashboardHref} className="btn-gold inline-flex items-center gap-2">
+                  Go to Dashboard <Icon name="arrow" />
+                </Link>
+              ) : (
+                <>
+                  <Link href="/signup" className="btn-gold inline-flex items-center gap-2">Get Started <Icon name="arrow" /></Link>
+                  <Link href="/login" className="btn-outline !py-2.5">Sign In</Link>
+                </>
+              )}
             </div>
           </div>
           <div className="relative mx-auto mt-14 max-w-5xl animate-fade-up px-6 [animation-delay:200ms]">
@@ -89,11 +141,26 @@ export default function Landing() {
           <p className="mb-10 mt-3 text-white/70">Helping traders make smarter decisions with intelligent market insights.</p>
           <div className="group overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
             <div className="flex w-max animate-marquee gap-5 [animation-duration:70s] group-hover:[animation-play-state:paused]">
-              {[...reviews, ...reviews].map((r, i) => (
-                <figure key={i} aria-hidden={i >= reviews.length} className="flex min-h-[200px] w-[340px] flex-col justify-between rounded-2xl border border-line bg-gradient-to-b from-[#121009] to-black p-6 text-left">
-                  <p className="text-gold" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
-                  <blockquote className="my-3 text-sm text-white/80">&ldquo;{r.q}&rdquo;</blockquote>
-                  <figcaption><b className="block">{r.n}</b><span className="text-xs text-mute">{r.r}</span></figcaption>
+              {[...displayReviews, ...displayReviews].map((r, i) => (
+                <figure
+                  key={i}
+                  aria-hidden={i >= displayReviews.length}
+                  className="flex min-h-[210px] w-[340px] flex-col justify-between rounded-2xl border border-line bg-gradient-to-b from-[#121009] to-black p-6 text-left"
+                >
+                  <p className="text-gold tracking-wide" aria-label={`${r.rating || 5} out of 5 stars`}>
+                    {"★".repeat(r.rating || 5)}
+                    {"☆".repeat(Math.max(0, 5 - (r.rating || 5)))}
+                  </p>
+                  <blockquote className="my-3 text-sm text-white/80 leading-relaxed line-clamp-4">
+                    &ldquo;{r.q}&rdquo;
+                  </blockquote>
+                  <figcaption className="flex items-center gap-3 pt-2 border-t border-white/5">
+                    <Avatar name={r.n} url={r.avatar} size={34} />
+                    <div className="min-w-0 flex-1">
+                      <b className="block truncate text-xs text-white">{r.n}</b>
+                      <span className="block truncate text-[11px] text-mute">{r.r}</span>
+                    </div>
+                  </figcaption>
                 </figure>
               ))}
             </div>
