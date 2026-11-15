@@ -2,6 +2,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setSession, clearSession, updateUser } from "@/redux/features/user/userSlice";
+import { getApiBaseUrl } from "@/redux/api/baseApi";
 import type { AuthUser } from "@/redux/type";
 export type { AuthUser };
 
@@ -31,6 +32,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const reduxToken = useAppSelector((state) => state.user.token);
   const [isLoading, setLoading] = useState(true);
 
+  const refresh = useCallback(async () => {
+    if (typeof window === "undefined") return;
+    const token = localStorage.getItem("ss_token");
+    if (!token) return;
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.user) {
+          dispatch(updateUser(data.user));
+        }
+      }
+    } catch {
+      // ignore network errors
+    }
+  }, [dispatch]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedToken = localStorage.getItem("ss_token");
@@ -43,9 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // ignore corrupted local storage
         }
       }
+      if (storedToken) {
+        refresh();
+      }
     }
     setLoading(false);
-  }, [dispatch]);
+  }, [dispatch, refresh]);
 
   const login = useCallback(
     (tok: string, u: AuthUser) => {
@@ -64,10 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     [dispatch]
   );
-
-  const refresh = useCallback(async () => {
-    // Redux RTK query getMe can also be dispatched if needed
-  }, []);
 
   return (
     <Ctx.Provider

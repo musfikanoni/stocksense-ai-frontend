@@ -32,7 +32,7 @@ const note =
 
 export default function SettingsView({ tabs }: { tabs: Tab[] }) {
   const router = useRouter();
-  const { user, setUser, logout } = useAuth();
+  const { user, setUser, logout, refresh } = useAuth();
   const [tab, setTab] = useState<Tab>("profile");
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
@@ -44,6 +44,10 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
   const [err, setErr] = useState("");
   const [delPw, setDelPw] = useState("");
   const [confirmDel, setConfirmDel] = useState(false);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const { data: billing } = useGetBillingQuery(undefined, {
     skip: !tabs.includes("billing") || !user,

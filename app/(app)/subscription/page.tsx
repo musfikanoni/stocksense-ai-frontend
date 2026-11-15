@@ -1,20 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGetPlansQuery } from "@/redux/api/plansApi";
 import {
   useGetBillingQuery,
   useCreateCheckoutMutation,
 } from "@/redux/api/billingApi";
+import { useAuth } from "@/lib/authContext";
 import { Icon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton";
 
 export default function Subscription() {
   const { data: plans = [], isLoading: plansLoading } = useGetPlansQuery();
-  const { data: billing } = useGetBillingQuery();
+  const { data: billing, refetch: refetchBilling } = useGetBillingQuery();
   const [checkout] = useCreateCheckoutMutation();
+  const { refresh } = useAuth();
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("checkout") === "success") {
+        toast.success("Payment completed successfully! Refreshing plan details...");
+        refresh();
+        refetchBilling();
+      }
+    }
+  }, [refresh, refetchBilling]);
 
   const currentPlan = billing?.plan.name ?? "Free";
 
