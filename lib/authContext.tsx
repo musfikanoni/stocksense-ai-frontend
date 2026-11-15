@@ -45,6 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data?.user) {
           dispatch(updateUser(data.user));
         }
+      } else if (res.status === 401) {
+        dispatch(clearSession());
       }
     } catch {
       // ignore network errors

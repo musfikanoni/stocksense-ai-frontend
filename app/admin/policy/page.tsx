@@ -30,8 +30,14 @@ export default function AdminPolicy() {
       const successMsg = `Saved ${title}. It is now live.`;
       setMsg(successMsg);
       toast.success(successMsg);
-    } catch {
-      const errorMsg = `Could not save ${title}.`;
+    } catch (err: unknown) {
+      const errorData = err as { status?: number; data?: { message?: string } };
+      const apiMessage = errorData?.data?.message;
+      const errorMsg =
+        apiMessage ||
+        (errorData?.status === 401
+          ? "Your admin session has expired. Please log out and log in again."
+          : `Could not save ${title}.`);
       setMsg(errorMsg);
       toast.error(errorMsg);
     } finally {
