@@ -64,7 +64,7 @@ export default function AdminUsers() {
             <tbody className="stagger divide-y divide-line/60">
               {users.map((u) => (
                 <tr key={u.id} className="transition hover:bg-white/5">
-                  <td className="py-3"><span className="flex items-center gap-3"><Avatar name={u.name} size={36} /><span><b className="block">{u.name}</b><span className="text-xs text-mute">{u.email}</span></span></span></td>
+                  <td className="py-3"><span className="flex items-center gap-3"><Avatar name={u.name} url={u.avatarUrl} size={36} /><span><b className="block">{u.name}</b><span className="text-xs text-mute">{u.email}</span></span></span></td>
                   <td>{u.planLabel}</td>
                   <td className="text-mute">{new Date(u.joinedAt).toLocaleDateString()}</td>
                   <td><span className={`rounded-full px-2.5 py-0.5 text-xs ${u.blocked ? "bg-down/15 text-down" : "bg-up/15 text-up"}`}>{u.blocked ? "Blocked" : "Active"}</span></td>

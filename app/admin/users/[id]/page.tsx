@@ -35,7 +35,7 @@ export default function AdminUserDetail() {
       <Link href="/admin/users" className="text-sm text-mute transition hover:text-gold">&larr; Back to users</Link>
       <section className="card flex flex-col items-center gap-3 text-center">
         <h2 className="self-start font-semibold">User Profile</h2>
-        <Avatar name={user.name} size={80} />
+        <Avatar name={user.name} url={user.avatarUrl} size={80} />
         <div>
           <p className="text-lg font-semibold">{user.name}</p>
           <p className="text-sm text-mute">{user.email}</p>

@@ -144,6 +144,7 @@ export interface AdminUser {
   lastName: string;
   name: string;
   email: string;
+  avatarUrl?: string;
   planName: string;
   billingCycle?: string;
   planLabel: string;
