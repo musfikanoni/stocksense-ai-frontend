@@ -233,7 +233,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
           google.accounts.id.renderButton(btnContainer, {
             theme: "outline",
             size: "large",
-            width: 350,
+            width: typeof window !== "undefined" ? Math.min(350, window.innerWidth - 64) : 300,
             text: "continue_with",
             shape: "rectangular",
           });
@@ -279,7 +279,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     <AuthShell>
       <form
         onSubmit={submit}
-        className="animate-scale-in w-full max-w-md space-y-4 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
+        className="animate-scale-in w-full max-w-md space-y-4 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-6 sm:p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
       >
         <Link
           href="/"

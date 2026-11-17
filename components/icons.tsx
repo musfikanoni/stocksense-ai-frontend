@@ -26,6 +26,7 @@ const paths: Record<string, React.ReactNode> = {
   trend: <path d="M3 17l6-6 4 4 8-8M15 7h6v6" />,
   camera: <><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></>,
   star: <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />,
+  menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>,
 };
 
 export function Icon({ name, className = "h-4 w-4" }: { name: string; className?: string }) {

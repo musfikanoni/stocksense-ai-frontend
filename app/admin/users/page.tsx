@@ -51,11 +51,11 @@ export default function AdminUsers() {
       </div>
       <section className="card overflow-x-auto">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">All User List ({usersData?.total ?? 0})</h2>
-          <div className="flex flex-wrap gap-2">
-            <input className="input !w-48" placeholder="Search here..." aria-label="Search users" value={q} onChange={(e) => setQ(e.target.value)} />
-            <select aria-label="Filter by status" className="input !w-32" value={status} onChange={(e) => setStatus(e.target.value)}>{["All Status", "Active", "Blocked"].map((o) => <option key={o}>{o}</option>)}</select>
-            <select aria-label="Filter by plan" className="input !w-44" value={plan} onChange={(e) => setPlan(e.target.value)}>{planOptions.map((o) => <option key={o}>{o}</option>)}</select>
+          <h2 className="font-semibold text-base sm:text-lg">All User List ({usersData?.total ?? 0})</h2>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+            <input className="input flex-1 sm:flex-none sm:!w-48 text-xs sm:text-sm" placeholder="Search here..." aria-label="Search users" value={q} onChange={(e) => setQ(e.target.value)} />
+            <select aria-label="Filter by status" className="input flex-1 sm:flex-none sm:!w-32 text-xs sm:text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>{["All Status", "Active", "Blocked"].map((o) => <option key={o}>{o}</option>)}</select>
+            <select aria-label="Filter by plan" className="input w-full sm:w-auto sm:!w-44 text-xs sm:text-sm" value={plan} onChange={(e) => setPlan(e.target.value)}>{planOptions.map((o) => <option key={o}>{o}</option>)}</select>
           </div>
         </div>
         {isLoading ? <div className="space-y-2 py-4">{Array.from({ length: 5 }, (_, i) => <div key={i} className="h-10 animate-pulse bg-white/5 rounded" />)}</div> : (

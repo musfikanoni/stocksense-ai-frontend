@@ -495,7 +495,7 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
 
       {tab === "billing" && (
         <div className="mx-auto w-full max-w-2xl space-y-6">
-          <section className="card animate-fade-up flex items-center justify-between gap-4">
+          <section className="card animate-fade-up flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold">Current Plan</h2>
               <p className="mt-1 text-sm text-mute">
@@ -510,17 +510,17 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
                 </p>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               {billing?.plan.name !== "Free" && (
                 <button
                   onClick={openPortal}
                   disabled={busy}
-                  className="btn-outline !py-2 text-sm"
+                  className="btn-outline !py-2 text-sm flex-1 sm:flex-none"
                 >
                   Manage
                 </button>
               )}
-              <Link href="/subscription" className="btn-gold !py-2 text-sm">
+              <Link href="/subscription" className="btn-gold !py-2 text-sm flex-1 sm:flex-none text-center">
                 Upgrade
               </Link>
             </div>

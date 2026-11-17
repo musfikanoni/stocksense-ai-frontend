@@ -84,21 +84,56 @@ export default function Alerts() {
       {rows.length === 0 && <p className="card text-sm text-mute">No alerts here yet. Open a stock and press Set Alert.</p>}
       <ul className="stagger space-y-3">
         {rows.map((a) => (
-          <li key={a.id} className="card card-hover flex flex-wrap items-center gap-x-6 gap-y-2 !p-4 text-sm">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-gold/15 text-gold"><Icon name="bell" /></span>
-            <b className="min-w-[10rem]">{alertLabel(a)}</b>
-            <Link href={`/stocks/${a.symbol}?from=alerts`} className="min-w-[9rem] hover:text-gold">{a.symbol} <span className="text-mute">({nameOf(a.symbol)})</span></Link>
-            <span className="text-xs text-mute">Created {new Date(a.createdAt).toLocaleDateString()}</span>
-            <span className="ml-auto flex items-center gap-4">
-              <span className={`text-xs ${a.active ? "text-up" : "text-mute"}`}>{a.active ? "Active" : "Disable"}</span>
-              <button role="switch" aria-checked={a.active} aria-label={`${a.active ? "Disable" : "Enable"} ${alertLabel(a)} for ${a.symbol}`}
-                onClick={() => handleToggle(a)}
-                className={`h-6 w-11 rounded-full p-0.5 transition ${a.active ? "bg-up" : "bg-line"}`}>
-                <span className={`block h-5 w-5 rounded-full bg-white transition ${a.active ? "translate-x-5" : ""}`} />
-              </button>
-              <button aria-label={`Delete ${alertLabel(a)} for ${a.symbol}`} onClick={() => handleDelete(a)} className="text-down hover:opacity-80"><Icon name="trash" className="h-[18px] w-[18px]" /></button>
-              <button aria-label={`Edit ${alertLabel(a)} for ${a.symbol}`} onClick={() => setEditing(a)} className="text-mute hover:text-white"><Icon name="gear" className="h-[18px] w-[18px]" /></button>
-            </span>
+          <li key={a.id} className="card card-hover flex flex-col md:flex-row md:items-center justify-between gap-3 !p-4 text-sm">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
+                <Icon name="bell" />
+              </span>
+              <div className="min-w-0">
+                <b className="block text-sm sm:text-base leading-snug">{alertLabel(a)}</b>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-mute mt-0.5">
+                  <Link href={`/stocks/${a.symbol}?from=alerts`} className="font-semibold text-white/90 hover:text-gold transition">
+                    {a.symbol} {nameOf(a.symbol) && `(${nameOf(a.symbol)})`}
+                  </Link>
+                  <span>•</span>
+                  <span>Created {new Date(a.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between md:justify-end gap-3 pt-2 md:pt-0 border-t border-line/40 md:border-t-0 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-xs ${a.active ? "text-up font-medium" : "text-mute"}`}>
+                  {a.active ? "Active" : "Disabled"}
+                </span>
+                <button
+                  role="switch"
+                  aria-checked={a.active}
+                  aria-label={`${a.active ? "Disable" : "Enable"} ${alertLabel(a)} for ${a.symbol}`}
+                  onClick={() => handleToggle(a)}
+                  className={`h-6 w-11 rounded-full p-0.5 transition ${a.active ? "bg-up" : "bg-line"}`}
+                >
+                  <span className={`block h-5 w-5 rounded-full bg-white transition ${a.active ? "translate-x-5" : ""}`} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  aria-label={`Edit ${alertLabel(a)} for ${a.symbol}`}
+                  onClick={() => setEditing(a)}
+                  className="rounded-lg p-1 text-mute hover:text-white transition"
+                >
+                  <Icon name="gear" className="h-[18px] w-[18px]" />
+                </button>
+                <button
+                  aria-label={`Delete ${alertLabel(a)} for ${a.symbol}`}
+                  onClick={() => handleDelete(a)}
+                  className="rounded-lg p-1 text-down hover:opacity-80 transition"
+                >
+                  <Icon name="trash" className="h-[18px] w-[18px]" />
+                </button>
+              </div>
+            </div>
           </li>
         ))}
       </ul>

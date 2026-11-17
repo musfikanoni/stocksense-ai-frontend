@@ -43,8 +43,8 @@ export default function AlertModal({ symbol, mode, basePrice = 241, initial, onS
   );
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={`Alert for ${symbol}`} onClick={onClose}>
-      <div className="card animate-scale-in w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+    <div className="animate-fade-in fixed inset-0 z-50 grid place-items-center bg-black/70 p-3 sm:p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={`Alert for ${symbol}`} onClick={onClose}>
+      <div className="card animate-scale-in w-full max-w-sm max-h-[90vh] overflow-y-auto !p-4 sm:!p-6" onClick={(e) => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
           <h2 className="font-semibold">{mode === "edit" ? "Change & Edit Alert" : "Set Alert"} <span className="text-mute">({symbol})</span></h2>
           <button onClick={onClose} aria-label="Close" className="text-mute hover:text-white">x</button>

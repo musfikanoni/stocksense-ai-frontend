@@ -13,6 +13,8 @@ import {
   useMarkAllReadMutation,
 } from "@/redux/api/notificationsApi";
 import { useGetAdminNotificationsQuery } from "@/redux/api/adminApi";
+import { useSidebar } from "@/lib/sidebarContext";
+import { Brand } from "./icons";
 
 const titles: [string, string][] = [
   ["/admin/users", "User Management"],
@@ -34,6 +36,7 @@ export default function Topbar() {
   const from = useSearchParams().get("from");
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { toggleMobile } = useSidebar();
   const [q, setQ] = useState("");
   const [openSearch, setOpenSearch] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -146,20 +149,38 @@ export default function Topbar() {
   const fullName = user?.name || (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "Account");
 
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-line bg-ink/80 px-6 py-4 backdrop-blur">
-      <span className="text-lg font-semibold text-gold shrink-0">{title}</span>
+    <header className="sticky top-0 z-20 flex items-center justify-between gap-2 sm:gap-4 border-b border-line bg-ink/80 px-3 sm:px-6 py-2.5 sm:py-4 backdrop-blur">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <button
+          type="button"
+          onClick={toggleMobile}
+          className="rounded-lg p-1.5 text-mute transition hover:bg-white/10 hover:text-white md:hidden shrink-0"
+          aria-label="Toggle navigation menu"
+        >
+          <Icon name="menu" className="h-5 w-5 sm:h-6 sm:w-6" />
+        </button>
+        <span className="hidden md:inline text-lg font-semibold text-gold shrink-0 truncate">
+          {title}
+        </span>
+        <div className="md:hidden flex items-center shrink-0">
+          <Brand iconClass="h-7 w-7" textClass="hidden xs:inline text-sm font-bold" />
+          <span className="xs:hidden text-xs font-semibold text-gold truncate max-w-[90px]">
+            {title}
+          </span>
+        </div>
+      </div>
 
       {/* Live Search Bar for User Dashboard */}
       {!admin ? (
-        <div ref={searchBox} className="relative flex-1 max-w-sm">
+        <div ref={searchBox} className="relative flex-1 min-w-0 max-w-xs sm:max-w-sm mx-1">
           <form role="search" onSubmit={handleSearchSubmit} className="relative">
             <Icon
               name="search"
-              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-mute pointer-events-none"
+              className="absolute left-3 top-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 -translate-y-1/2 text-mute pointer-events-none"
             />
             <input
-              className="input !rounded-full !pl-9 !pr-8 text-sm w-full transition focus:border-gold/60"
-              placeholder="Search stocks... (e.g. AAPL, Tesla)"
+              className="input !rounded-full !pl-8 sm:!pl-9 !pr-7 sm:!pr-8 text-xs sm:text-sm w-full transition focus:border-gold/60 !py-1.5 sm:!py-2"
+              placeholder="Search stocks..."
               aria-label="Search stocks"
               value={q}
               onFocus={() => {
@@ -178,7 +199,7 @@ export default function Topbar() {
                   setQ("");
                   setOpenSearch(false);
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mute hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-mute hover:text-white"
                 aria-label="Clear search"
               >
                 ✕
@@ -187,7 +208,7 @@ export default function Topbar() {
           </form>
 
           {showDropdown && (
-            <div className="card animate-scale-in absolute left-0 top-full z-40 mt-2 w-full !p-2 shadow-2xl max-h-80 overflow-y-auto">
+            <div className="card animate-scale-in fixed sm:absolute left-3 sm:left-0 right-3 sm:right-auto top-[58px] sm:top-full z-50 mt-2 w-auto sm:w-96 !p-2 shadow-2xl max-h-80 overflow-y-auto">
               {isSearching ? (
                 <div className="p-4 text-center text-xs text-mute animate-pulse">
                   Searching equities...
@@ -222,7 +243,7 @@ export default function Topbar() {
                               <span className="font-bold text-sm leading-tight block">
                                 {s.symbol}
                               </span>
-                              <span className="text-xs text-mute truncate block max-w-[140px] sm:max-w-[180px]">
+                              <span className="text-xs text-mute truncate block max-w-[130px] sm:max-w-[180px]">
                                 {s.name}
                               </span>
                             </div>
@@ -249,7 +270,7 @@ export default function Topbar() {
       ) : (
         <div className="flex-1" />
       )}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         {/* Notifications */}
         <div ref={notifBox} className="relative">
           <button
@@ -267,7 +288,7 @@ export default function Topbar() {
             <div
               role="dialog"
               aria-label="Notifications"
-              className="card animate-scale-in absolute right-0 top-full z-30 mt-2 w-80 !p-4 shadow-xl"
+              className="card animate-scale-in fixed sm:absolute right-3 top-[58px] sm:top-full z-50 mt-2 w-[calc(100vw-1.5rem)] max-w-xs sm:w-80 !p-4 shadow-xl"
             >
               <div className="mb-3 flex items-center justify-between">
                 <p className="font-semibold text-sm">Notifications</p>
@@ -295,16 +316,16 @@ export default function Topbar() {
           <button
             onClick={() => setOpenUserMenu(!openUserMenu)}
             aria-expanded={openUserMenu}
-            className="flex items-center gap-2.5 rounded-lg p-1.5 transition hover:bg-white/5 text-sm"
+            className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg p-1 sm:p-1.5 transition hover:bg-white/5 text-sm"
           >
             {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt={fullName} className="h-8 w-8 rounded-full object-cover" />
+              <img src={user.avatarUrl} alt={fullName} className="h-7 w-7 sm:h-8 sm:w-8 rounded-full object-cover" />
             ) : (
-              <Avatar name={fullName} size={32} />
+              <Avatar name={fullName} size={30} />
             )}
-            <span className="hidden text-left leading-tight sm:block">
-              <span className="block font-medium">{fullName}</span>
-              <span className="block text-[11px] text-mute">
+            <span className="hidden text-left leading-tight lg:block">
+              <span className="block font-medium text-xs sm:text-sm">{fullName}</span>
+              <span className="block text-[10px] sm:text-[11px] text-mute">
                 {user?.role === "admin" ? "Admin" : user?.planLabel || "Free Tier"}
               </span>
             </span>
@@ -312,7 +333,7 @@ export default function Topbar() {
           </button>
 
           {openUserMenu && (
-            <div className="card animate-scale-in absolute right-0 top-full z-30 mt-2 w-56 !p-2 shadow-2xl">
+            <div className="card animate-scale-in absolute right-0 top-full z-50 mt-2 w-56 max-w-[calc(100vw-1.5rem)] !p-2 shadow-2xl">
               <div className="border-b border-line px-3 py-2">
                 <p className="font-semibold text-sm truncate">{fullName}</p>
                 <p className="text-xs text-mute truncate">{user?.email}</p>

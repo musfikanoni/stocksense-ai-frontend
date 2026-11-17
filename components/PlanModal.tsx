@@ -33,8 +33,8 @@ export default function PlanModal({ plan, onSave, onClose }: { plan?: Plan; onSa
   };
 
   return (
-    <div className="animate-fade-in fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={plan ? "Edit Plan" : "Create New Plan"} onClick={onClose}>
-      <div className="card animate-scale-in w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
+    <div className="animate-fade-in fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/70 p-3 sm:p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={plan ? "Edit Plan" : "Create New Plan"} onClick={onClose}>
+      <div className="card animate-scale-in w-full max-w-md max-h-[90vh] overflow-y-auto space-y-4 !p-4 sm:!p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between"><h2 className="font-semibold">{plan ? "Edit Plan" : "Create New Plan"}</h2><button onClick={onClose} aria-label="Close" className="text-mute hover:text-white"><Icon name="x" /></button></div>
         <label className="block text-sm"><span className="mb-1 block text-mute">Plan Name</span><input className="input" placeholder="Enter plan name" value={name} onChange={(e) => setName(e.target.value)} /></label>
         <label className="block text-sm"><span className="mb-1 block text-mute">Plan Price ($)</span><input className="input" inputMode="decimal" placeholder="Enter plan price amount" value={price} onChange={(e) => setPrice(e.target.value)} /></label>

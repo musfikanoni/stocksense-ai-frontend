@@ -99,44 +99,52 @@ export default function StockPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <CompanyLogo symbol={stock.symbol} size={64} />
-          <div>
-            <h1 className="text-2xl font-bold">{stock.symbol} <span className="font-normal text-mute">({stock.name})</span></h1>
-            <p className="text-sm text-mute">{stock.exchange} <span className="text-up">• {stock.marketOpen ? "Open Market" : "Market Closed"}</span></p>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <CompanyLogo symbol={stock.symbol} size={52} />
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">
+              {stock.symbol} <span className="font-normal text-mute">({stock.name})</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-mute">
+              {stock.exchange} <span className="text-up">• {stock.marketOpen ? "Open Market" : "Market Closed"}</span>
+            </p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="mb-2 flex justify-end gap-3">
-            <button onClick={toggleWatchlist} className="btn-gold flex items-center gap-2 !px-4 !py-2 text-sm">
+        <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+          <div className="mb-2 flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+            <button onClick={toggleWatchlist} className="btn-gold flex items-center justify-center gap-2 !px-3.5 !py-2 text-xs sm:text-sm flex-1 sm:flex-none">
               <Icon name="bookmark" />{inList ? "In Watchlist" : "Add to Watchlist"}
             </button>
-            <button onClick={() => setAlertOpen(true)} className="btn-outline flex items-center gap-2 !py-2"><Icon name="bell" />Set Alert</button>
+            <button onClick={() => setAlertOpen(true)} className="btn-outline flex items-center justify-center gap-2 !px-3.5 !py-2 text-xs sm:text-sm flex-1 sm:flex-none">
+              <Icon name="bell" />Set Alert
+            </button>
           </div>
-          <p className="text-3xl font-bold">{stock.price ? usd(stock.price) : "—"}</p>
-          <p className="text-sm">{stock.change !== null ? <Change v={stock.change} /> : "—"} <span className={up ? "text-up" : "text-down"}>({up ? "+" : ""}{p.toFixed(2)}%)</span></p>
-          <p className="text-xs text-mute">Volume {stock.volume ?? "—"}</p>
-          {stock.dataSource === "simulated" && <p className="mt-1 text-xs text-gold/70">⚠ Simulated prices</p>}
+          <div className="text-left sm:text-right">
+            <p className="text-2xl sm:text-3xl font-bold">{stock.price ? usd(stock.price) : "—"}</p>
+            <p className="text-xs sm:text-sm">{stock.change !== null ? <Change v={stock.change} /> : "—"} <span className={up ? "text-up" : "text-down"}>({up ? "+" : ""}{p.toFixed(2)}%)</span></p>
+            <p className="text-xs text-mute">Volume {stock.volume ?? "—"}</p>
+            {stock.dataSource === "simulated" && <p className="mt-1 text-xs text-gold/70">⚠ Simulated prices</p>}
+          </div>
         </div>
       </div>
       {note && <p role="status" className="animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-sm text-up">{note}</p>}
 
-      <div className="stagger grid gap-6 lg:grid-cols-3">
-        <section className="card">
+      <div className="stagger grid gap-5 sm:gap-6 lg:grid-cols-3">
+        <section className="card !p-4 sm:!p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 font-semibold"><Icon name="pulse" className="h-4 w-4 text-gold" />AI Signal</h2>
+            <h2 className="flex items-center gap-2 font-semibold text-base sm:text-lg"><Icon name="pulse" className="h-4 w-4 text-gold" />AI Signal</h2>
             {stock.signal && <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${signalTone[stock.signal]}`}>{stock.signal} ({sc >= 75 ? "Strong" : "Moderate"})</span>}
           </div>
           <p className="mb-3 text-center text-xs text-mute"><Tip term="Confidence">Confidence Score &amp; Reason</Tip></p>
-          <div className="flex justify-center"><ConfidenceRing value={sc} size={110} /></div>
+          <div className="flex justify-center"><ConfidenceRing value={sc} size={100} /></div>
           {summary
             ? <p className="mt-4 text-center text-xs text-mute">{summary.summary}</p>
             : stock.reason && <p className="mt-4 text-center text-xs text-mute">{stock.reason}</p>}
         </section>
 
-        <section className="card">
-          <h2 className="mb-4 flex items-center gap-2 font-semibold"><Icon name="target" className="h-4 w-4 text-gold" />AI Levels</h2>
+        <section className="card !p-4 sm:!p-6">
+          <h2 className="mb-4 flex items-center gap-2 font-semibold text-base sm:text-lg"><Icon name="target" className="h-4 w-4 text-gold" />AI Levels</h2>
           <ul className="space-y-3 text-sm">
             {rows.map((row) => (
               <li key={row.label} className="flex items-center justify-between">
@@ -151,8 +159,8 @@ export default function StockPage() {
           </ul>
         </section>
 
-        <section className="card">
-          <h2 className="mb-4 flex items-center gap-2 font-semibold"><Icon name="trend" className="h-4 w-4 text-gold" />Market Bias</h2>
+        <section className="card !p-4 sm:!p-6">
+          <h2 className="mb-4 flex items-center gap-2 font-semibold text-base sm:text-lg"><Icon name="trend" className="h-4 w-4 text-gold" />Market Bias</h2>
           <ul className="space-y-2">
             {marketBias.map((m) => (
               <li key={m.symbol} className={`flex items-center justify-between rounded-lg px-3 py-2 ${m.signal ? signalTone[m.signal as Signal] : "bg-line/20 text-mute"}`}>
@@ -164,25 +172,25 @@ export default function StockPage() {
         </section>
       </div>
 
-      <section className="card">
+      <section className="card !p-4 sm:!p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-3 font-semibold">{stock.symbol} - Stock Chart
+          <h2 className="flex items-center gap-2 sm:gap-3 font-semibold text-base sm:text-lg">{stock.symbol} - Stock Chart
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${up ? "bg-up/15 text-up" : "bg-down/15 text-down"}`}>{up ? "+" : ""}{p.toFixed(2)}% today</span>
           </h2>
-          <div className="flex gap-2" role="group" aria-label="Chart range">
+          <div className="flex gap-1.5 sm:gap-2" role="group" aria-label="Chart range">
             {ranges.map((r) => (
               <button key={r} aria-pressed={range === r} onClick={() => setRange(r)}
-                className={`h-8 w-10 rounded-lg text-xs ${range === r ? "bg-gold font-semibold text-ink" : "bg-line text-mute hover:text-white"}`}>{r}</button>
+                className={`h-7 sm:h-8 w-9 sm:w-10 rounded-lg text-xs transition ${range === r ? "bg-gold font-semibold text-ink" : "bg-line text-mute hover:text-white"}`}>{r}</button>
             ))}
           </div>
         </div>
-        <div className="h-72">
+        <div className="h-60 sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={hist}>
               <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f5c84b" stopOpacity={0.35} /><stop offset="100%" stopColor="#f5c84b" stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid stroke="#2a2518" vertical={false} />
               <XAxis dataKey="label" stroke="#a39b85" fontSize={11} minTickGap={24} />
-              <YAxis stroke="#a39b85" fontSize={11} domain={["auto", "auto"]} width={60} tickFormatter={(v: number) => `$${Math.round(v)}`} />
+              <YAxis stroke="#a39b85" fontSize={11} domain={["auto", "auto"]} width={48} tickFormatter={(v: number) => `$${Math.round(v)}`} />
               <Tooltip formatter={(v: number) => [usd(v), "Price"]} contentStyle={{ background: "#14120c", border: "1px solid #2a2518", borderRadius: 8 }} />
               <Area type="monotone" dataKey="price" stroke="#f5c84b" strokeWidth={2} fill="url(#g)" />
             </AreaChart>

@@ -66,14 +66,14 @@ export default function ContactModal() {
       </button>
       {open && (
         <div
-          className="animate-fade-in fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+          className="animate-fade-in fixed inset-0 z-50 grid place-items-center bg-black/70 p-3 sm:p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label="Message us"
           onClick={() => setOpen(false)}
         >
           <div
-            className="card animate-scale-in w-full max-w-sm"
+            className="card animate-scale-in w-full max-w-sm max-h-[90vh] overflow-y-auto !p-4 sm:!p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">

@@ -82,10 +82,10 @@ export default function AdminReviews() {
 
       <section className="card overflow-x-auto">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">User Reviews List ({total})</h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 className="font-semibold text-base sm:text-lg">User Reviews List ({total})</h2>
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <input
-              className="input !w-52"
+              className="input flex-1 sm:flex-none sm:!w-52 text-xs sm:text-sm"
               placeholder="Search reviewer or comment..."
               aria-label="Search reviews"
               value={q}
@@ -96,7 +96,7 @@ export default function AdminReviews() {
             />
             <select
               aria-label="Filter by status"
-              className="input !w-36"
+              className="input flex-1 sm:flex-none sm:!w-36 text-xs sm:text-sm"
               value={status}
               onChange={(e) => {
                 setStatus(e.target.value);
