@@ -195,7 +195,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="relative mx-auto mt-10 sm:mt-14 max-w-5xl animate-fade-up px-4 sm:px-6 [animation-delay:200ms]">
-            <Image src="/landing/monitor.webp" alt="StockSense AI dashboard shown on a monitor" width={1600} height={738} priority className="h-auto w-full" />
+            <Image src="/landing/monitor.jpg" alt="StockSense AI dashboard shown on a monitor" width={1024} height={480} priority className="h-auto w-full" />
             <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink to-transparent" />
           </div>
         </section>
