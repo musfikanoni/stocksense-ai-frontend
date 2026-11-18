@@ -14,10 +14,10 @@ export default function Dashboard() {
   const { data: allStocks = [] } = useGetStocksQuery();
 
   if (isLoading) return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2"><Skeleton className="h-72" /><Skeleton className="h-72" /></div>
-      <Skeleton className="h-52" />
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-28" />)}</div>
+    <div className="space-y-6 w-full">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 w-full"><Skeleton className="h-72" /><Skeleton className="h-72" /></div>
+      <Skeleton className="h-52 w-full" />
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 w-full">{Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-28" />)}</div>
     </div>
   );
 
@@ -31,9 +31,9 @@ export default function Dashboard() {
   const { topOpportunities, outlook, highConfidence, recentAlerts } = dash;
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
-        <section className="card !p-4 sm:!p-6">
+    <div className="space-y-5 sm:space-y-6 w-full min-w-0">
+      <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-2 w-full">
+        <section className="card w-full !p-4 sm:!p-6">
           <h2 className="mb-2 font-semibold text-base sm:text-lg">Top Opportunities</h2>
           <ul className="stagger divide-y divide-line">
             {topOpportunities.map((s, i) => (
@@ -61,7 +61,7 @@ export default function Dashboard() {
             ))}
           </ul>
         </section>
-        <section className="card !p-4 sm:!p-6">
+        <section className="card w-full !p-4 sm:!p-6">
           <h2 className="mb-2 font-semibold text-base sm:text-lg">Recent Alerts</h2>
           {recentAlerts.length === 0
             ? <p className="text-sm text-mute">No alerts yet. Open a stock and press Set Alert.</p>
@@ -89,8 +89,8 @@ export default function Dashboard() {
       </div>
 
       {outlook && (
-        <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
-          <section className="card lg:col-span-2 !p-4 sm:!p-6">
+        <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3 w-full">
+          <section className="card w-full lg:col-span-2 !p-4 sm:!p-6">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
               <div><h2 className="font-semibold text-base sm:text-lg">Daily AI Outlook</h2><p className="text-xs text-mute">Today Market Bias AI Summary</p></div>
               <span className="text-xs text-mute">{outlook.date}</span>
@@ -114,7 +114,7 @@ export default function Dashboard() {
             </div>
           </section>
           {highConfidence && (
-            <section className="card space-y-3 !p-4 sm:!p-6">
+            <section className="card w-full space-y-3 !p-4 sm:!p-6">
               <h2 className="font-semibold text-base sm:text-lg">High Confidence Setup</h2>
               <Link href={href(highConfidence.symbol)} className="flex items-center gap-3">
                 <CompanyLogo symbol={highConfidence.symbol} size={36} />
@@ -127,11 +127,11 @@ export default function Dashboard() {
         </div>
       )}
 
-      <section>
+      <section className="w-full">
         <h2 className="mb-3 font-semibold text-base sm:text-lg">Explore</h2>
-        <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 w-full">
           {allStocks.map((s) => (
-            <Link key={s.symbol} href={href(s.symbol)} className="card card-hover !p-3 sm:!p-4">
+            <Link key={s.symbol} href={href(s.symbol)} className="card card-hover w-full !p-3 sm:!p-4">
               <div className="flex items-center gap-2.5 sm:gap-3">
                 <CompanyLogo symbol={s.symbol} size={30} />
                 <span className="min-w-0"><b className="block text-sm">{s.symbol}</b><span className="block truncate text-[11px] sm:text-xs text-mute">{s.name}</span></span>
@@ -143,6 +143,5 @@ export default function Dashboard() {
         </div>
       </section>
     </div>
-  );
   );
 }

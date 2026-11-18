@@ -98,8 +98,8 @@ export default function StockPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div className="space-y-5 sm:space-y-6 w-full min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 w-full">
         <div className="flex items-center gap-3 sm:gap-4">
           <CompanyLogo symbol={stock.symbol} size={52} />
           <div className="min-w-0">
@@ -130,8 +130,8 @@ export default function StockPage() {
       </div>
       {note && <p role="status" className="animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-sm text-up">{note}</p>}
 
-      <div className="stagger grid gap-5 sm:gap-6 lg:grid-cols-3">
-        <section className="card !p-4 sm:!p-6">
+      <div className="stagger grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-3 w-full">
+        <section className="card w-full !p-4 sm:!p-6">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-semibold text-base sm:text-lg"><Icon name="pulse" className="h-4 w-4 text-gold" />AI Signal</h2>
             {stock.signal && <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${signalTone[stock.signal]}`}>{stock.signal} ({sc >= 75 ? "Strong" : "Moderate"})</span>}
@@ -159,7 +159,7 @@ export default function StockPage() {
           </ul>
         </section>
 
-        <section className="card !p-4 sm:!p-6">
+        <section className="card w-full !p-4 sm:!p-6">
           <h2 className="mb-4 flex items-center gap-2 font-semibold text-base sm:text-lg"><Icon name="trend" className="h-4 w-4 text-gold" />Market Bias</h2>
           <ul className="space-y-2">
             {marketBias.map((m) => (
@@ -172,7 +172,7 @@ export default function StockPage() {
         </section>
       </div>
 
-      <section className="card !p-4 sm:!p-6">
+      <section className="card w-full !p-4 sm:!p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 sm:gap-3 font-semibold text-base sm:text-lg">{stock.symbol} - Stock Chart
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${up ? "bg-up/15 text-up" : "bg-down/15 text-down"}`}>{up ? "+" : ""}{p.toFixed(2)}% today</span>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Avatar from "./Avatar";
 import { Icon } from "./icons";
+import { Settings } from "lucide-react";
 import {
   useUpdateMeMutation,
   useChangePasswordMutation,
@@ -22,12 +23,12 @@ import { useAuth } from "@/lib/authContext";
 import ReviewSettingsTab from "./ReviewSettingsTab";
 
 export type Tab = "profile" | "security" | "billing" | "policy" | "review";
-const labels: Record<Tab, string> = {
-  profile: "Profile",
-  security: "Security & Privacy",
-  billing: "Payment & Billing",
-  policy: "Policy & Agreement",
-  review: "Feedback & Review",
+const tabMeta: Record<Tab, { label: string; icon: string }> = {
+  profile: { label: "Profile", icon: "users" },
+  security: { label: "Security & Privacy", icon: "gear" },
+  billing: { label: "Payment & Billing", icon: "wallet" },
+  policy: { label: "Policy & Agreement", icon: "doc" },
+  review: { label: "Feedback & Review", icon: "star" },
 };
 const note =
   "animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-center text-sm text-up";
@@ -227,12 +228,16 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
 
   const openPortal = async () => {
     try {
-      const { url } = await createPortal().unwrap();
-      window.location.href = url;
-    } catch {
-      const msg = "Billing portal is not configured yet.";
-      setMsg(msg);
-      toast.info(msg);
+      setMsg("");
+      const res = await createPortal().unwrap();
+      if (res?.url) {
+        window.location.href = res.url;
+      }
+    } catch (error: unknown) {
+      const errorMsg =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Billing portal is not configured yet. Please activate it in your Stripe dashboard.";
+      toast.error(errorMsg);
     }
   };
 
@@ -240,30 +245,52 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
 
   return (
     <div className="space-y-6">
-      <div
-        className="flex flex-wrap justify-center gap-2"
-        role="tablist"
-        aria-label="Settings sections"
-      >
-        {tabs.map((t) => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => {
-              setTab(t);
-              setMsg("");
-              setErr("");
-            }}
-            className={`rounded-full border px-4 py-1.5 text-xs transition duration-200 ${
-              tab === t
-                ? "border-gold bg-gold/15 text-gold"
-                : "border-line text-mute hover:text-white"
-            }`}
-          >
-            {labels[t]}
-          </button>
-        ))}
+      {/* Responsive Single-Row Scrollable Tab Navigation */}
+      <div className="relative w-full">
+        <div
+          role="tablist"
+          aria-label="Settings sections"
+          className="flex items-center gap-2 overflow-x-auto scroll-smooth py-1 px-1 sm:justify-center [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {tabs.map((t) => {
+            const active = tab === t;
+            const meta = tabMeta[t];
+            return (
+              <button
+                key={t}
+                role="tab"
+                aria-selected={active}
+                onClick={(e) => {
+                  setTab(t);
+                  setMsg("");
+                  setErr("");
+                  e.currentTarget.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest",
+                    inline: "center",
+                  });
+                }}
+                className={`inline-flex shrink-0 whitespace-nowrap items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition duration-200 active:scale-95 ${
+                  active
+                    ? "border-gold bg-gold/15 text-gold shadow-[0_2px_12px_-3px_rgba(245,200,75,0.4)]"
+                    : "border-line bg-white/[0.02] text-mute hover:border-white/20 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {meta.icon === "gear" ? (
+                  <Settings
+                    className={`h-3.5 w-3.5 shrink-0 ${active ? "text-gold" : "text-mute"}`}
+                  />
+                ) : (
+                  <Icon
+                    name={meta.icon}
+                    className={`h-3.5 w-3.5 shrink-0 ${active ? "text-gold" : "text-mute"}`}
+                  />
+                )}
+                <span>{meta.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
       {msg && <p role="status" className={`${note} ${box}`}>{msg}</p>}
 
@@ -293,7 +320,7 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
           <button
             onClick={() => {
               logout();
-              router.push("/login");
+              router.replace("/login");
             }}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-down/60 py-2.5 text-sm text-down transition hover:bg-down/10"
           >
@@ -418,7 +445,7 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
         <div className={`${box} space-y-6`}>
           <form className="card animate-fade-up space-y-3" onSubmit={changePw}>
             <h2 className="flex items-center gap-2 font-semibold">
-              <Icon name="gear" className="h-4 w-4 text-gold" />
+              <Settings className="h-4 w-4 text-gold" />
               Change Password
             </h2>
             <label className="block text-sm">
@@ -498,15 +525,39 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
           <section className="card animate-fade-up flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold">Current Plan</h2>
-              <p className="mt-1 text-sm text-mute">
-                {billing?.plan.label ?? "Free"}{" "}
-                <span className="ml-2 rounded-full bg-up/15 px-2 py-0.5 text-xs text-up">
-                  {billing?.plan.status ?? "Active"}
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                <span className="text-sm font-medium">
+                  {billing?.plan.label ?? "Free"}
                 </span>
-              </p>
+                {billing?.plan.cancelAtPeriodEnd ? (
+                  <span className="rounded-full bg-gold/15 px-2.5 py-0.5 text-xs font-medium text-gold">
+                    Cancels at period end
+                  </span>
+                ) : (
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      billing?.plan.name === "Free"
+                        ? "bg-white/10 text-mute"
+                        : "bg-up/15 text-up"
+                    }`}
+                  >
+                    {billing?.plan.status
+                      ? billing.plan.status.charAt(0).toUpperCase() +
+                        billing.plan.status.slice(1)
+                      : "Active"}
+                  </span>
+                )}
+              </div>
               {billing?.plan.currentPeriodEnd && (
-                <p className="text-xs text-mute mt-1">
-                  Renews {new Date(billing.plan.currentPeriodEnd).toLocaleDateString()}
+                <p className="text-xs text-mute mt-1.5">
+                  {billing.plan.cancelAtPeriodEnd ? (
+                    <span>
+                      <strong className="text-white font-medium">Plan Cancelled:</strong> Access active until{" "}
+                      {new Date(billing.plan.currentPeriodEnd).toLocaleDateString()} (No further charges)
+                    </span>
+                  ) : (
+                    `Renews ${new Date(billing.plan.currentPeriodEnd).toLocaleDateString()}`
+                  )}
                 </p>
               )}
             </div>
@@ -514,10 +565,10 @@ export default function SettingsView({ tabs }: { tabs: Tab[] }) {
               {billing?.plan.name !== "Free" && (
                 <button
                   onClick={openPortal}
-                  disabled={busy}
+                  disabled={busy || isPortalLoading}
                   className="btn-outline !py-2 text-sm flex-1 sm:flex-none"
                 >
-                  Manage
+                  {isPortalLoading ? "Opening…" : "Manage"}
                 </button>
               )}
               <Link href="/subscription" className="btn-gold !py-2 text-sm flex-1 sm:flex-none text-center">

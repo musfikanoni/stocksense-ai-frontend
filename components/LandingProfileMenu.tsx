@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import Avatar from "./Avatar";
 import { Icon } from "./icons";
+import { Settings } from "lucide-react";
 
 export default function LandingProfileMenu() {
   const { user, logout } = useAuth();
@@ -84,7 +85,7 @@ export default function LandingProfileMenu() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-white/90 transition hover:bg-white/5"
             >
-              <Icon name="gear" className="h-4 w-4 text-mute" />
+              <Settings className="h-4 w-4 text-mute" />
               Settings & Profile
             </Link>
             {!isAdmin && (

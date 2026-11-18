@@ -275,7 +275,7 @@ export default function Landing() {
 
       <footer id="contact" className="border-t border-line bg-black">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:gap-5 px-4 sm:px-6 py-6 text-sm text-mute lg:flex-row">
-          <Brand iconClass="h-7 w-7" textClass="text-base text-white" />
+          <Brand iconClass="h-7 w-auto" textClass="text-base text-white" />
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
             <ContactModal />
             <span className="flex items-center gap-2"><Icon name="mail" />example123@gmail.com</span>

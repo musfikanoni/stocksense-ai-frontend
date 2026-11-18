@@ -50,11 +50,11 @@ export default function Subscription() {
   if (plansLoading) return <div className="space-y-4"><Skeleton className="h-10" /><div className="grid gap-5 sm:grid-cols-2"><Skeleton className="h-72" /><Skeleton className="h-72" /></div></div>;
 
   return (
-    <div>
-      <h1 className="mb-1 text-center text-2xl font-bold">Choose Your <span className="text-gold">Plan</span></h1>
-      <p className="mb-8 text-center text-sm text-mute">Upgrade to unlock full AI analysis</p>
+    <div className="w-full min-w-0">
+      <h1 className="mb-1 text-center text-xl sm:text-2xl font-bold">Choose Your <span className="text-gold">Plan</span></h1>
+      <p className="mb-6 sm:mb-8 text-center text-xs sm:text-sm text-mute">Upgrade to unlock full AI analysis</p>
       {err && <p role="alert" className="mb-4 rounded-lg bg-down/15 px-4 py-2 text-center text-sm text-down">{err}</p>}
-      <div className="stagger mx-auto grid max-w-3xl gap-5 sm:grid-cols-2">
+      <div className="stagger mx-auto grid grid-cols-1 sm:grid-cols-2 max-w-3xl gap-5 w-full">
         {plans.map((p) => {
           const id = p._id ?? String(p.id);
           const isCurrent = p.name === currentPlan;

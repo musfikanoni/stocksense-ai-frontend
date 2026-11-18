@@ -12,6 +12,7 @@ import { useGetStocksQuery } from "@/redux/api/stocksApi";
 import type { AlertItem, Signal } from "@/redux/type";
 import AlertModal from "@/components/AlertModal";
 import { Icon } from "@/components/icons";
+import { Settings } from "lucide-react";
 import type { AlertConfig } from "@/lib/alerts";
 
 const tabs = ["All Alert", "Active Alert", "Disable Alert"] as const;
@@ -74,17 +75,17 @@ export default function Alerts() {
   if (isLoading) return <div className="space-y-3">{Array.from({ length: 4 }, (_, i) => <div key={i} className="card h-16 animate-pulse" />)}</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2" role="tablist" aria-label="Filter alerts">
+    <div className="space-y-4 w-full min-w-0">
+      <div className="flex items-center gap-2 overflow-x-auto scroll-smooth py-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Filter alerts">
         {tabs.map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}
-            className={`rounded-full border px-4 py-1.5 text-xs transition duration-200 ${tab === t ? "border-gold bg-gold/15 text-gold" : "border-line text-mute hover:text-white"}`}>{t}</button>
+            className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-xs transition duration-200 ${tab === t ? "border-gold bg-gold/15 text-gold" : "border-line text-mute hover:text-white"}`}>{t}</button>
         ))}
       </div>
-      {rows.length === 0 && <p className="card text-sm text-mute">No alerts here yet. Open a stock and press Set Alert.</p>}
-      <ul className="stagger space-y-3">
+      {rows.length === 0 && <p className="card w-full text-sm text-mute">No alerts here yet. Open a stock and press Set Alert.</p>}
+      <ul className="stagger space-y-3 w-full">
         {rows.map((a) => (
-          <li key={a.id} className="card card-hover flex flex-col md:flex-row md:items-center justify-between gap-3 !p-4 text-sm">
+          <li key={a.id} className="card card-hover w-full flex flex-col md:flex-row md:items-center justify-between gap-3 !p-4 text-sm">
             <div className="flex items-center gap-3 min-w-0">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
                 <Icon name="bell" />
@@ -123,7 +124,7 @@ export default function Alerts() {
                   onClick={() => setEditing(a)}
                   className="rounded-lg p-1 text-mute hover:text-white transition"
                 >
-                  <Icon name="gear" className="h-[18px] w-[18px]" />
+                  <Settings className="h-[18px] w-[18px]" />
                 </button>
                 <button
                   aria-label={`Delete ${alertLabel(a)} for ${a.symbol}`}

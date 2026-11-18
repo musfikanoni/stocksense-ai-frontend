@@ -24,8 +24,7 @@ export default function Watchlist() {
   if (isLoading) return <div className="space-y-3">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-14" />)}</div>;
 
   return (
-  return (
-    <section className="card !p-0 overflow-hidden">
+    <section className="card w-full !p-0 overflow-hidden">
       {rows.length === 0 ? (
         <p className="p-6 text-sm text-mute">Your watchlist is empty. Open a stock and press Add to Watchlist.</p>
       ) : (

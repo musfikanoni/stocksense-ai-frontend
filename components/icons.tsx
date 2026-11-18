@@ -1,3 +1,6 @@
+import { Settings } from "lucide-react";
+import Image from "next/image";
+
 const paths: Record<string, React.ReactNode> = {
   grid: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>,
   bookmark: <path d="M6 3h12v18l-6-4-6 4z" />,
@@ -30,6 +33,9 @@ const paths: Record<string, React.ReactNode> = {
 };
 
 export function Icon({ name, className = "h-4 w-4" }: { name: string; className?: string }) {
+  if (name === "gear" || name === "settings") {
+    return <Settings className={className} aria-hidden="true" />;
+  }
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       {paths[name]}
@@ -37,21 +43,28 @@ export function Icon({ name, className = "h-4 w-4" }: { name: string; className?
   );
 }
 
-// Logo mark: three bars and a rising arrow, as in the Figma design.
-export function BrandMark({ className = "h-9 w-9" }: { className?: string }) {
+// Logo mark: new 3D candlestick rising arrow logo
+export function BrandMark({ className = "h-9 w-auto" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M6 30V18M13 30V13M20 30V20" /><path d="M14 14l8-6 12-4M28 4h6v6" />
-    </svg>
+    <Image
+      src="/logo.png"
+      alt="StockSense Logo"
+      width={1024}
+      height={669}
+      className={`object-contain shrink-0 ${className}`}
+      priority
+    />
   );
 }
 
 // Icon + wordmark
-export function Brand({ iconClass = "h-8 w-8", textClass = "text-lg" }: { iconClass?: string; textClass?: string }) {
+export function Brand({ iconClass = "h-8 w-auto", textClass = "text-lg" }: { iconClass?: string; textClass?: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
-      <BrandMark className={`${iconClass} text-gold`} />
-      <span className={`font-bold ${textClass}`}>Stock<span className="text-gold">Sense</span></span>
+    <span className="inline-flex items-center gap-2.5 shrink-0">
+      <BrandMark className={iconClass} />
+      <span className={`font-bold shrink-0 whitespace-nowrap ${textClass}`}>
+        Stock<span className="text-gold">Sense</span>
+      </span>
     </span>
   );
 }

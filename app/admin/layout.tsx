@@ -17,11 +17,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <AuthGuard adminOnly>
       <SidebarProvider>
-        <div className="min-h-screen md:flex bg-ink">
+        <div className="min-h-screen w-full md:flex bg-ink">
           <Suspense fallback={null}><Sidebar items={items} tag="Admin" /></Suspense>
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 w-full flex-1 flex-col">
             <Suspense fallback={null}><Topbar /></Suspense>
-            <main className="flex-1 p-4 sm:p-6">{children}</main>
+            <main className="flex-1 w-full p-3 sm:p-6">{children}</main>
           </div>
         </div>
       </SidebarProvider>
