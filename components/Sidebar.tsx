@@ -57,12 +57,12 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex md:h-screen md:w-64 md:shrink-0 md:sticky md:top-0 md:flex-col md:border-r md:border-line md:p-4 bg-ink/50 backdrop-blur-sm z-30">
-        <Link href="/" aria-label="StockSense AI home" className="mb-6 flex items-center justify-between gap-2.5">
-          <Brand iconClass="h-8 w-auto" textClass="text-base font-bold" />
+      {/* Desktop / Tablet Sidebar */}
+      <aside className="hidden md:flex md:h-screen md:w-52 lg:w-64 md:shrink-0 md:sticky md:top-0 md:flex-col md:border-r md:border-line md:p-3 lg:p-4 bg-ink/50 backdrop-blur-sm z-30 transition-all duration-200">
+        <Link href="/" aria-label="StockSense AI home" className="mb-5 lg:mb-6 flex items-center justify-between gap-2">
+          <Brand iconClass="h-7 w-auto lg:h-8" textClass="text-sm lg:text-base font-bold" />
           {tag && (
-            <span className="shrink-0 rounded bg-gold/15 px-2 py-0.5 text-[10px] font-semibold text-gold tracking-wide">
+            <span className="shrink-0 rounded bg-gold/15 px-1.5 py-0.5 text-[9px] lg:text-[10px] font-semibold text-gold tracking-wide">
               {tag}
             </span>
           )}
@@ -75,7 +75,7 @@ export default function Sidebar({
                 key={i.href}
                 href={i.href}
                 aria-current={on ? "page" : undefined}
-                className={`flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm transition duration-200 ${
+                className={`flex items-center gap-2.5 lg:gap-3 whitespace-nowrap rounded-lg px-2.5 py-2 lg:px-3 lg:py-2.5 text-xs lg:text-sm transition duration-200 ${
                   on
                     ? "bg-gold/15 font-semibold text-gold shadow-[inset_2px_0_0_#f5c84b]"
                     : "text-mute hover:bg-white/5 hover:text-white"
@@ -86,7 +86,7 @@ export default function Sidebar({
                 ) : (
                   <Icon name={i.icon} className="h-4 w-4 shrink-0" />
                 )}
-                {i.label}
+                <span className="truncate">{i.label}</span>
               </Link>
             );
           })}

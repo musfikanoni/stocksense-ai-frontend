@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Suspense fallback={null}><Sidebar items={items} premium /></Suspense>
           <div className="flex min-w-0 w-full flex-1 flex-col">
             <Suspense fallback={null}><Topbar /></Suspense>
-            <main className="flex-1 w-full p-3 sm:p-6">{children}</main>
+            <main className="flex-1 w-full min-w-0 p-3 sm:p-5 lg:p-6 overflow-x-hidden">{children}</main>
           </div>
         </div>
       </SidebarProvider>

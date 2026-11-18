@@ -80,18 +80,18 @@ export default function AdminReviews() {
         description="Moderate, approve, and manage customer reviews."
         noIndex
       />
-      <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="stagger grid gap-4 grid-cols-1 sm:grid-cols-3">
         {statCards.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>
 
-      <section className="card overflow-x-auto">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold text-base sm:text-lg">User Reviews List ({total})</h2>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+      <section className="card !p-4 sm:!p-6 w-full min-w-0">
+        <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h2 className="font-semibold text-base sm:text-lg shrink-0">User Reviews List ({total})</h2>
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto">
             <input
-              className="input flex-1 sm:flex-none sm:!w-52 text-xs sm:text-sm"
+              className="input flex-1 sm:w-48 md:w-56 text-xs sm:text-sm"
               placeholder="Search reviewer or comment..."
               aria-label="Search reviews"
               value={q}
@@ -102,7 +102,7 @@ export default function AdminReviews() {
             />
             <select
               aria-label="Filter by status"
-              className="input flex-1 sm:flex-none sm:!w-36 text-xs sm:text-sm"
+              className="input w-32 sm:w-36 text-xs sm:text-sm shrink-0"
               value={status}
               onChange={(e) => {
                 setStatus(e.target.value);
@@ -123,99 +123,101 @@ export default function AdminReviews() {
             ))}
           </div>
         ) : (
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="text-xs text-mute">
-              <tr className="border-b border-line">
-                <th className="pb-3 font-normal">Reviewer</th>
-                <th className="font-normal">Rating</th>
-                <th className="font-normal">Comment</th>
-                <th className="font-normal">Status</th>
-                <th className="text-right font-normal">Action</th>
-              </tr>
-            </thead>
-            <tbody className="stagger divide-y divide-line/60">
-              {reviews.map((r) => {
-                const isApproved = r.status === "approved";
-                const isRejected = r.status === "rejected";
+          <div className="w-full overflow-x-auto [scrollbar-width:thin] [scrollbar-color:rgba(245,200,75,0.25)_transparent] -mx-4 sm:-mx-6 px-4 sm:px-6">
+            <table className="w-full min-w-[620px] text-left text-sm">
+              <thead className="text-xs text-mute">
+                <tr className="border-b border-line">
+                  <th className="pb-3 font-normal w-[22%] min-w-[140px]">Reviewer</th>
+                  <th className="pb-3 font-normal w-[16%] min-w-[100px]">Rating</th>
+                  <th className="pb-3 font-normal w-[34%] min-w-[180px]">Comment</th>
+                  <th className="pb-3 font-normal w-[13%] min-w-[85px]">Status</th>
+                  <th className="pb-3 font-normal w-[15%] min-w-[115px] text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="stagger divide-y divide-line/60">
+                {reviews.map((r) => {
+                  const isApproved = r.status === "approved";
+                  const isRejected = r.status === "rejected";
 
-                return (
-                  <tr key={r.id} className="transition hover:bg-white/5">
-                    <td className="py-3">
-                      <span className="flex items-center gap-3">
-                        <Avatar name={r.name} url={r.avatarUrl} size={36} />
-                        <span>
-                          <b className="block">{r.name}</b>
-                          <span className="text-xs text-mute">{r.role || "Trader"}</span>
+                  return (
+                    <tr key={r.id} className="transition hover:bg-white/5">
+                      <td className="py-3">
+                        <span className="flex items-center gap-2.5 sm:gap-3">
+                          <Avatar name={r.name} url={r.avatarUrl} size={32} />
+                          <span className="min-w-0">
+                            <b className="block text-xs sm:text-sm truncate max-w-[120px] sm:max-w-[150px]">{r.name}</b>
+                            <span className="text-[11px] sm:text-xs text-mute truncate block max-w-[120px]">{r.role || "Trader"}</span>
+                          </span>
                         </span>
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-gold text-xs">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i}>{i < (r.rating || 5) ? "★" : "☆"}</span>
-                        ))}
-                        <span className="ml-1 text-mute font-mono text-[11px]">({r.rating || 5})</span>
-                      </div>
-                    </td>
-                    <td className="max-w-xs">
-                      <p
-                        className="truncate text-xs text-mute cursor-pointer hover:text-white"
-                        title={r.comment}
-                        onClick={() => setSelectedReview(r)}
-                      >
-                        &ldquo;{r.comment}&rdquo;
-                      </p>
-                    </td>
-                    <td>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          isApproved
-                            ? "bg-up/15 text-up border border-up/20"
-                            : isRejected
-                            ? "bg-down/15 text-down border border-down/20"
-                            : "bg-gold/15 text-gold border border-gold/20"
-                        }`}
-                      >
-                        {r.status ? r.status.charAt(0).toUpperCase() + r.status.slice(1) : "Approved"}
-                      </span>
-                    </td>
-                    <td className="text-right">
-                      <span className="inline-flex items-center gap-1.5">
-                        {!isApproved && (
-                          <button
-                            disabled={isUpdating}
-                            onClick={() => handleStatusChange(r.id, "approved")}
-                            className="rounded-lg bg-up/20 border border-up/40 px-2.5 py-1 text-xs font-medium text-up transition hover:bg-up hover:text-black"
-                            title="Approve and show on landing page"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        {!isRejected && (
-                          <button
-                            disabled={isUpdating}
-                            onClick={() => handleStatusChange(r.id, "rejected")}
-                            className="rounded-lg bg-down/20 border border-down/40 px-2.5 py-1 text-xs font-medium text-down transition hover:bg-down hover:text-white"
-                            title="Reject / hide from landing page"
-                          >
-                            Reject
-                          </button>
-                        )}
-                        <button
-                          disabled={isDeleting}
-                          onClick={() => setReviewToDelete({ id: r.id, name: r.name })}
-                          className="rounded-lg bg-white/5 border border-line px-2.5 py-1 text-xs font-medium text-mute transition hover:bg-down hover:border-down hover:text-white"
-                          title="Permanently delete review"
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-1 text-gold text-xs whitespace-nowrap">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span key={i}>{i < (r.rating || 5) ? "★" : "☆"}</span>
+                          ))}
+                          <span className="ml-1 text-mute font-mono text-[11px]">({r.rating || 5})</span>
+                        </div>
+                      </td>
+                      <td className="max-w-[240px]">
+                        <p
+                          className="text-xs text-mute cursor-pointer hover:text-white line-clamp-2 leading-relaxed"
+                          title={r.comment}
+                          onClick={() => setSelectedReview(r)}
                         >
-                          Delete
-                        </button>
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                          &ldquo;{r.comment}&rdquo;
+                        </p>
+                      </td>
+                      <td>
+                        <span
+                          className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            isApproved
+                              ? "bg-up/15 text-up border border-up/20"
+                              : isRejected
+                              ? "bg-down/15 text-down border border-down/20"
+                              : "bg-gold/15 text-gold border border-gold/20"
+                          }`}
+                        >
+                          {r.status ? r.status.charAt(0).toUpperCase() + r.status.slice(1) : "Approved"}
+                        </span>
+                      </td>
+                      <td className="text-right">
+                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                          {!isApproved && (
+                            <button
+                              disabled={isUpdating}
+                              onClick={() => handleStatusChange(r.id, "approved")}
+                              className="rounded-lg bg-up/20 border border-up/40 px-2 sm:px-2.5 py-1 text-xs font-medium text-up transition hover:bg-up hover:text-black"
+                              title="Approve and show on landing page"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          {!isRejected && (
+                            <button
+                              disabled={isUpdating}
+                              onClick={() => handleStatusChange(r.id, "rejected")}
+                              className="rounded-lg bg-down/20 border border-down/40 px-2 sm:px-2.5 py-1 text-xs font-medium text-down transition hover:bg-down hover:text-white"
+                              title="Reject / hide from landing page"
+                            >
+                              Reject
+                            </button>
+                          )}
+                          <button
+                            disabled={isDeleting}
+                            onClick={() => setReviewToDelete({ id: r.id, name: r.name })}
+                            className="rounded-lg bg-white/5 border border-line px-2 sm:px-2.5 py-1 text-xs font-medium text-mute transition hover:bg-down hover:border-down hover:text-white"
+                            title="Permanently delete review"
+                          >
+                            Delete
+                          </button>
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {reviews.length === 0 && !isLoading && (
