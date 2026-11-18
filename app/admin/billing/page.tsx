@@ -33,12 +33,42 @@ export default function AdminBilling() {
         <StatCard label="Paid Users" value={data?.paidUsers ?? 0} delta="" note="subscribers" />
       </div>
       <section className="card !p-4 sm:!p-6 w-full min-w-0">
-        <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="mb-4 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 sm:gap-4">
           <h2 className="font-semibold text-base sm:text-lg shrink-0">Billing Information ({data?.total ?? 0})</h2>
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto">
-            <input className="input flex-1 sm:w-44 text-xs sm:text-sm" placeholder="Search here..." aria-label="Search billing" value={q} onChange={(e) => setQ(e.target.value)} />
-            <select aria-label="Filter by status" className="input w-28 sm:w-32 text-xs sm:text-sm shrink-0" value={status} onChange={(e) => setStatus(e.target.value)}>{["All Status", "Pending", "Paid", "Failed"].map((o) => <option key={o}>{o}</option>)}</select>
-            <select aria-label="Filter by plan" className="input w-36 sm:w-40 text-xs sm:text-sm shrink-0" value={plan} onChange={(e) => setPlan(e.target.value)}>{["All Plan", "Premium (Monthly)", "Premium (Yearly)"].map((o) => <option key={o}>{o}</option>)}</select>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full xl:w-auto">
+            <input
+              className="input w-full sm:flex-1 xl:w-52 text-xs sm:text-sm min-w-0"
+              placeholder="Search billing..."
+              aria-label="Search billing"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 shrink-0">
+              <select
+                aria-label="Filter by status"
+                className="input w-full sm:w-32 text-xs sm:text-sm shrink-0"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+              >
+                {["All Status", "Pending", "Paid", "Failed"].map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="Filter by plan"
+                className="input w-full sm:w-44 text-xs sm:text-sm shrink-0"
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+              >
+                {["All Plan", "Premium (Monthly)", "Premium (Yearly)"].map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
         {isLoading ? <div className="space-y-2 py-4">{Array.from({ length: 5 }, (_, i) => <div key={i} className="h-10 animate-pulse bg-white/5 rounded" />)}</div> : (

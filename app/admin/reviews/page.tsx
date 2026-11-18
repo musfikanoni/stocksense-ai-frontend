@@ -87,11 +87,11 @@ export default function AdminReviews() {
       </div>
 
       <section className="card !p-4 sm:!p-6 w-full min-w-0">
-        <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="mb-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
           <h2 className="font-semibold text-base sm:text-lg shrink-0">User Reviews List ({total})</h2>
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
             <input
-              className="input flex-1 sm:w-48 md:w-56 text-xs sm:text-sm"
+              className="input w-full sm:flex-1 lg:w-64 text-xs sm:text-sm min-w-0"
               placeholder="Search reviewer or comment..."
               aria-label="Search reviews"
               value={q}
@@ -102,7 +102,7 @@ export default function AdminReviews() {
             />
             <select
               aria-label="Filter by status"
-              className="input w-32 sm:w-36 text-xs sm:text-sm shrink-0"
+              className="input w-full sm:w-40 text-xs sm:text-sm shrink-0"
               value={status}
               onChange={(e) => {
                 setStatus(e.target.value);
@@ -110,7 +110,9 @@ export default function AdminReviews() {
               }}
             >
               {["All Status", "Approved", "Pending", "Rejected"].map((o) => (
-                <option key={o}>{o}</option>
+                <option key={o} value={o}>
+                  {o}
+                </option>
               ))}
             </select>
           </div>
