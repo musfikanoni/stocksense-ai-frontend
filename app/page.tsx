@@ -7,6 +7,7 @@ import ContactModal from "@/components/ContactModal";
 import LandingPricing from "@/components/LandingPricing";
 import LandingProfileMenu from "@/components/LandingProfileMenu";
 import Avatar from "@/components/Avatar";
+import Helmet from "@/components/Helmet";
 import { useAuth } from "@/lib/authContext";
 import { useGetPublicReviewsQuery } from "@/redux/api/reviewsApi";
 
@@ -55,6 +56,11 @@ export default function Landing() {
 
   return (
     <>
+      <Helmet
+        title="StockSense AI | Intelligent Market Insights"
+        description="Real-time sentiment, AI confidence scores, smart support & resistance, and instant stock trading alerts."
+        keywords="stock analysis, AI trading signals, stock market alerts, sentiment analysis"
+      />
       <header className="sticky top-0 z-30 border-b border-white/5 bg-ink/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 md:gap-4 lg:gap-8 px-4 py-2.5 sm:px-6 sm:py-3">
           <a

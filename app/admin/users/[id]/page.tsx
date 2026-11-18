@@ -8,6 +8,7 @@ import {
 } from "@/redux/api/adminApi";
 import Avatar from "@/components/Avatar";
 import Skeleton from "@/components/Skeleton";
+import Helmet from "@/components/Helmet";
 
 export default function AdminUserDetail() {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +33,11 @@ export default function AdminUserDetail() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <Helmet
+        title={`User: ${user.name} | Admin`}
+        description="View detailed user profile and subscription invoices."
+        noIndex
+      />
       <Link href="/admin/users" className="text-sm text-mute transition hover:text-gold">&larr; Back to users</Link>
       <section className="card flex flex-col items-center gap-3 text-center">
         <h2 className="self-start font-semibold">User Profile</h2>

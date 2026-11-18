@@ -4,6 +4,7 @@ import { useGetAdminBillingQuery } from "@/redux/api/adminApi";
 import Avatar from "@/components/Avatar";
 import StatCard from "@/components/StatCard";
 import { Icon } from "@/components/icons";
+import Helmet from "@/components/Helmet";
 
 const tone = { Paid: "bg-up/15 text-up", Pending: "bg-gold/15 text-gold", Failed: "bg-down/15 text-down" } as const;
 
@@ -22,6 +23,11 @@ export default function AdminBilling() {
 
   return (
     <div className="space-y-6">
+      <Helmet
+        title="Revenue & Billing | Admin"
+        description="View revenue statistics, subscription transactions, and invoice history."
+        noIndex
+      />
       <div className="stagger grid gap-4 sm:grid-cols-2 xl:max-w-2xl">
         <StatCard label="Total Revenue" value={`$${data?.totalRevenue ?? 0}`} delta="" note="all-time collected" />
         <StatCard label="Paid Users" value={data?.paidUsers ?? 0} delta="" note="subscribers" />

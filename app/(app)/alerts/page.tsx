@@ -13,6 +13,7 @@ import type { AlertItem, Signal } from "@/redux/type";
 import AlertModal from "@/components/AlertModal";
 import { Icon } from "@/components/icons";
 import { Settings } from "lucide-react";
+import Helmet from "@/components/Helmet";
 import type { AlertConfig } from "@/lib/alerts";
 
 const tabs = ["All Alert", "Active Alert", "Disable Alert"] as const;
@@ -76,6 +77,10 @@ export default function Alerts() {
 
   return (
     <div className="space-y-4 w-full min-w-0">
+      <Helmet
+        title="Alerts"
+        description="Manage your custom stock price, breakout, and signal alerts."
+      />
       <div className="flex items-center gap-2 overflow-x-auto scroll-smooth py-1 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Filter alerts">
         {tabs.map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useGetPolicyQuery } from "@/redux/api/plansApi";
 import { useAdminUpdatePolicyMutation } from "@/redux/api/adminApi";
 import { Icon } from "@/components/icons";
+import Helmet from "@/components/Helmet";
 
 export default function AdminPolicy() {
   const { data: policy, isLoading } = useGetPolicyQuery();
@@ -54,6 +55,11 @@ export default function AdminPolicy() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      <Helmet
+        title="Policy & Agreement | Admin"
+        description="Edit terms of service, privacy policy, and user agreements."
+        noIndex
+      />
       {msg && <p role="status" className="animate-fade-up rounded-lg bg-up/15 px-4 py-2 text-sm text-up">{msg}</p>}
       <div className="stagger space-y-6">
         {docs.map((d) => (

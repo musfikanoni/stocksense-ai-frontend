@@ -11,7 +11,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "StockSense AI | AI stock analysis",
+  title: {
+    default: "StockSense AI | AI Stock Analysis",
+    template: "%s | StockSense AI",
+  },
   description: "Watchlists, price alerts and AI summaries for the stocks you follow.",
 };
 

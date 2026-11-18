@@ -8,6 +8,7 @@ import {
   type ReviewItem,
 } from "@/redux/api/reviewsApi";
 import Avatar from "@/components/Avatar";
+import Helmet from "@/components/Helmet";
 import StatCard from "@/components/StatCard";
 import { Icon } from "@/components/icons";
 
@@ -74,6 +75,11 @@ export default function AdminReviews() {
 
   return (
     <div className="space-y-6">
+      <Helmet
+        title="Review Management | Admin"
+        description="Moderate, approve, and manage customer reviews."
+        noIndex
+      />
       <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((s) => (
           <StatCard key={s.label} {...s} />

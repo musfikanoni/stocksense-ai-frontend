@@ -5,6 +5,7 @@ import { useGetWatchlistQuery, useRemoveFromWatchlistMutation } from "@/redux/ap
 import CompanyLogo from "@/components/CompanyLogo";
 import { Icon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton";
+import Helmet from "@/components/Helmet";
 import { Change, usd } from "@/components/ui";
 
 export default function Watchlist() {
@@ -25,6 +26,10 @@ export default function Watchlist() {
 
   return (
     <section className="card w-full !p-0 overflow-hidden">
+      <Helmet
+        title="Watchlist"
+        description="Monitor your favorite stocks in real-time with price changes and AI signals."
+      />
       {rows.length === 0 ? (
         <p className="p-6 text-sm text-mute">Your watchlist is empty. Open a stock and press Add to Watchlist.</p>
       ) : (

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Brand } from "@/components/icons";
 import Terms from "@/components/Terms";
+import Helmet from "@/components/Helmet";
 import {
   useForgotPasswordMutation,
   useVerifyOtpMutation,
@@ -162,6 +163,10 @@ export default function ForgotPassword() {
 
   return (
     <main className="grid min-h-screen place-items-center p-4">
+      <Helmet
+        title={titles[step]}
+        description="Reset your StockSense AI account password via secure 6-digit verification code."
+      />
       <form
         key={step}
         onSubmit={next}

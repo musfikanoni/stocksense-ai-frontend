@@ -8,6 +8,7 @@ import {
 } from "@/redux/api/adminApi";
 import type { Plan } from "@/redux/type";
 import PlanModal from "@/components/PlanModal";
+import Helmet from "@/components/Helmet";
 import Switch from "@/components/Switch";
 import { Icon } from "@/components/icons";
 import type { Plan as UiPlan } from "@/redux/type";
@@ -60,6 +61,11 @@ export default function AdminPlans() {
 
   return (
     <div className="space-y-6">
+      <Helmet
+        title="Plan Management | Admin"
+        description="Configure subscription plans, features, and pricing."
+        noIndex
+      />
       <h2 className="text-lg font-semibold">Pricing Plan Management</h2>
       <div className="stagger grid items-stretch gap-5 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {plans.map((p) => {

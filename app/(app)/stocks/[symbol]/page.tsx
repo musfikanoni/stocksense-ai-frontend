@@ -22,6 +22,7 @@ import CompanyLogo from "@/components/CompanyLogo";
 import Tip from "@/components/Tip";
 import { Icon } from "@/components/icons";
 import Skeleton from "@/components/Skeleton";
+import Helmet from "@/components/Helmet";
 import { Change, signalTone, usd } from "@/components/ui";
 import type { Range, Signal } from "@/redux/type";
 
@@ -105,6 +106,10 @@ export default function StockPage() {
 
   return (
     <div className="space-y-5 sm:space-y-6 w-full min-w-0">
+      <Helmet
+        title={`${stock.symbol} Stock Analysis`}
+        description={`Real-time AI price analysis, trading signals, and interactive chart for ${stock.name} (${stock.symbol}).`}
+      />
       {/* Top Header: Responsive across small, medium, and desktop screens */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 w-full">
         {/* Left: Stock Identity */}

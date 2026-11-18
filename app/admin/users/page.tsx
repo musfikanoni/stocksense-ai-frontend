@@ -9,6 +9,7 @@ import {
 } from "@/redux/api/adminApi";
 import Avatar from "@/components/Avatar";
 import StatCard from "@/components/StatCard";
+import Helmet from "@/components/Helmet";
 
 const planOptions = ["All Plan", "Free", "Premium (Monthly)", "Premium (Yearly)"] as const;
 
@@ -46,6 +47,11 @@ export default function AdminUsers() {
 
   return (
     <div className="space-y-6">
+      <Helmet
+        title="User Management | Admin"
+        description="View, search, filter, and manage registered StockSense AI users."
+        noIndex
+      />
       <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statCards.map((s) => <StatCard key={s.label} {...s} />)}
       </div>

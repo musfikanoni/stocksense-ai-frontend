@@ -5,6 +5,7 @@ import { useGetStocksQuery } from "@/redux/api/stocksApi";
 import ConfidenceRing from "@/components/ConfidenceRing";
 import CompanyLogo from "@/components/CompanyLogo";
 import Skeleton from "@/components/Skeleton";
+import Helmet from "@/components/Helmet";
 import { Change, SignalTag, usd } from "@/components/ui";
 
 const href = (s: string) => `/stocks/${s}?from=dashboard`;
@@ -32,6 +33,10 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5 sm:space-y-6 w-full min-w-0">
+      <Helmet
+        title="Dashboard"
+        description="Overview of top stock opportunities, market bias, high-confidence setups, and recent alerts."
+      />
       <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-2 w-full">
         <section className="card w-full !p-4 sm:!p-6">
           <h2 className="mb-2 font-semibold text-base sm:text-lg">Top Opportunities</h2>
