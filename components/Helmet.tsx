@@ -61,6 +61,16 @@ export default function Helmet({
       "content",
       noIndex ? "noindex, nofollow" : "index, follow"
     );
+
+    // 6. Favicon / Tab Icon
+    let iconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement | null;
+    if (!iconLink) {
+      iconLink = document.createElement("link");
+      iconLink.rel = "icon";
+      document.head.appendChild(iconLink);
+    }
+    iconLink.type = "image/png";
+    iconLink.href = "/logo.png";
   }, [title, description, keywords, noIndex]);
 
   return null;

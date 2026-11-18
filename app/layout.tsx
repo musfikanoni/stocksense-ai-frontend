@@ -16,6 +16,14 @@ export const metadata: Metadata = {
     template: "%s | StockSense AI",
   },
   description: "Watchlists, price alerts and AI summaries for the stocks you follow.",
+  icons: {
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
