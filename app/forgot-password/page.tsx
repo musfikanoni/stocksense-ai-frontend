@@ -69,7 +69,7 @@ export default function ForgotPassword() {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [err, setErr] = useState("");
-  const [devOtp, setDevOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [forgotPasswordApi, { isLoading: isForgotLoading }] =
     useForgotPasswordMutation();
@@ -79,14 +79,39 @@ export default function ForgotPassword() {
 
   const busy = isForgotLoading || isVerifyLoading || isResetLoading;
 
+  const handleResend = async () => {
+    if (resendCooldown > 0 || busy) return;
+    try {
+      await forgotPasswordApi({ email }).unwrap();
+      toast.success("Verification code resent to your email!");
+      setResendCooldown(30);
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error: unknown) {
+      interface ErrorResponse {
+        data?: { message?: string };
+        error?: string;
+        message?: string;
+      }
+      const e = error as ErrorResponse;
+      toast.error(e?.data?.message || "Failed to resend code. Please try again.");
+    }
+  };
+
   const next = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
 
     try {
       if (step === 0) {
-        const res = await forgotPasswordApi({ email }).unwrap();
-        if (res.devOtp) setDevOtp(res.devOtp);
+        await forgotPasswordApi({ email }).unwrap();
         toast.success("Verification code sent to your email!");
         setStep(1);
       } else if (step === 1) {
@@ -165,11 +190,26 @@ export default function ForgotPassword() {
         {step === 1 && (
           <div className="space-y-3">
             <Otp value={otp} onChange={setOtp} />
-            {devOtp && (
-              <p className="rounded bg-gold/10 px-3 py-1.5 text-center text-xs text-gold">
-                Dev OTP: <b>{devOtp}</b>
-              </p>
-            )}
+            <div className="flex items-center justify-between text-xs text-mute pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep(0);
+                  setOtp(Array(6).fill(""));
+                }}
+                className="text-mute hover:text-white transition"
+              >
+                &larr; Change email
+              </button>
+              <button
+                type="button"
+                disabled={resendCooldown > 0 || busy}
+                onClick={handleResend}
+                className="text-gold hover:underline disabled:opacity-50 disabled:no-underline font-medium"
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+              </button>
+            </div>
           </div>
         )}
         {step === 2 && (
