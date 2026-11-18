@@ -57,7 +57,7 @@ export default function Landing() {
     <>
       <header className="sticky top-0 z-30 border-b border-white/5 bg-ink/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <a href="#home" aria-label="StockSense home" onClick={() => setMobileMenuOpen(false)}>
+          <a href="#home" aria-label="StockSense AI home" onClick={() => setMobileMenuOpen(false)}>
             <Brand textClass="text-base sm:text-lg" />
           </a>
           <nav className="hidden items-center gap-8 text-sm md:flex">
@@ -156,7 +156,7 @@ export default function Landing() {
               Trade With <span className="text-gold">Precision</span> Intelligence
             </h1>
             <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-sm sm:text-base text-white/80">
-              StockSense delivers institutional-grade AI analysis for US equities — real-time signals, support/resistance mapping, and price targets with confidence scoring.
+              StockSense AI delivers institutional-grade AI analysis for US equities — real-time signals, support/resistance mapping, and price targets with confidence scoring.
             </p>
             <div className="mt-6 sm:mt-8 flex flex-wrap justify-center gap-3">
               {isLoggedIn ? (
@@ -176,7 +176,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="relative mx-auto mt-10 sm:mt-14 max-w-5xl animate-fade-up px-4 sm:px-6 [animation-delay:200ms]">
-            <Image src="/landing/monitor.webp" alt="StockSense dashboard shown on a monitor" width={1600} height={738} priority className="h-auto w-full" />
+            <Image src="/landing/monitor.webp" alt="StockSense AI dashboard shown on a monitor" width={1600} height={738} priority className="h-auto w-full" />
             <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink to-transparent" />
           </div>
         </section>
@@ -281,7 +281,7 @@ export default function Landing() {
             <span className="flex items-center gap-2"><Icon name="mail" />example123@gmail.com</span>
             <span className="flex items-center gap-2"><Icon name="phone" />+1234567854</span>
           </div>
-          <p className="text-xs">&copy; 2026 StockSense. All rights reserved.</p>
+          <p className="text-xs">&copy; 2026 StockSense AI. All rights reserved.</p>
         </div>
       </footer>
     </>

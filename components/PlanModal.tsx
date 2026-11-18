@@ -41,10 +41,14 @@ export default function PlanModal({ plan, onSave, onClose }: { plan?: Plan; onSa
         <div className="flex items-center justify-between text-sm"><span>Highlight</span><Switch on={highlight} onChange={() => setHighlight(!highlight)} label="Highlight plan" /></div>
         <div className="text-sm">
           <span className="mb-1 block text-mute">Plan Feature</span>
-          <ul className="mb-2 space-y-1.5">
+          <ul className="mb-2 max-h-48 overflow-y-auto space-y-1.5 pr-1">
             {features.map((f) => (
-              <li key={f} className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-1.5"><span>{f}</span>
-                <button onClick={() => setFeatures(features.filter((x) => x !== f))} aria-label={`Remove ${f}`} className="text-mute hover:text-down"><Icon name="x" className="h-3.5 w-3.5" /></button></li>
+              <li key={f} className="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-3 py-1.5">
+                <span className="min-w-0 flex-1 break-words">{f}</span>
+                <button onClick={() => setFeatures(features.filter((x) => x !== f))} aria-label={`Remove ${f}`} className="text-mute hover:text-down shrink-0">
+                  <Icon name="x" className="h-3.5 w-3.5" />
+                </button>
+              </li>
             ))}
           </ul>
           <div className="flex gap-2">

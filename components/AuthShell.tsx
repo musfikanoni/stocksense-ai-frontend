@@ -25,7 +25,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/30 z-[1]" />
 
           <div className="relative z-10">
-            <Link href="/" aria-label="StockSense home" className="inline-block transition hover:opacity-90">
+            <Link href="/" aria-label="StockSense AI home" className="inline-block transition hover:opacity-90">
               <Brand />
             </Link>
           </div>

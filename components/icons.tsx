@@ -48,7 +48,7 @@ export function BrandMark({ className = "h-9 w-auto" }: { className?: string }) 
   return (
     <Image
       src="/logo.png"
-      alt="StockSense Logo"
+      alt="StockSense AI Logo"
       width={1024}
       height={669}
       className={`object-contain shrink-0 ${className}`}
@@ -62,8 +62,8 @@ export function Brand({ iconClass = "h-8 w-auto", textClass = "text-lg" }: { ico
   return (
     <span className="inline-flex items-center gap-2.5 shrink-0">
       <BrandMark className={iconClass} />
-      <span className={`font-bold shrink-0 whitespace-nowrap ${textClass}`}>
-        Stock<span className="text-gold">Sense</span>
+      <span className={`font-bold shrink-0 whitespace-nowrap text-white ${textClass}`}>
+        StockSense <span className="text-gold">AI</span>
       </span>
     </span>
   );

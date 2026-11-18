@@ -94,7 +94,7 @@ export default function ReviewSettingsTab({ boxClass }: { boxClass: string }) {
       <section className={`card animate-fade-up ${boxClass} space-y-5`}>
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div>
-            <h3 className="font-semibold text-white">Your StockSense Review</h3>
+            <h3 className="font-semibold text-white">Your StockSense AI Review</h3>
             <p className="text-xs text-mute mt-0.5">
               This review is displayed on our landing page.
             </p>
@@ -203,7 +203,7 @@ export default function ReviewSettingsTab({ boxClass }: { boxClass: string }) {
           {existingReview ? "Edit Your Review" : "Share Your Experience"}
         </h3>
         <p className="text-xs text-mute mt-0.5">
-          Your feedback helps fellow traders learn more about StockSense and helps
+          Your feedback helps fellow traders learn more about StockSense AI and helps
           improve our AI signals.
         </p>
       </div>
@@ -291,7 +291,7 @@ export default function ReviewSettingsTab({ boxClass }: { boxClass: string }) {
             rows={4}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="How has StockSense's AI analysis, trade signals, or price alerts helped your trading journey?"
+            placeholder="How has StockSense AI's analysis, trade signals, or price alerts helped your trading journey?"
             maxLength={500}
             required
             className="input w-full text-xs leading-relaxed resize-none"

@@ -283,7 +283,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
       >
         <Link
           href="/"
-          aria-label="StockSense home"
+          aria-label="StockSense AI home"
           className="mb-2 flex justify-center lg:hidden"
         >
           <Brand />

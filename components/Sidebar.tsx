@@ -59,7 +59,7 @@ export default function Sidebar({
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex md:h-screen md:w-64 md:shrink-0 md:sticky md:top-0 md:flex-col md:border-r md:border-line md:p-4 bg-ink/50 backdrop-blur-sm z-30">
-        <Link href="/" aria-label="StockSense home" className="mb-6 flex items-center justify-between gap-2.5">
+        <Link href="/" aria-label="StockSense AI home" className="mb-6 flex items-center justify-between gap-2.5">
           <Brand iconClass="h-8 w-auto" textClass="text-base font-bold" />
           {tag && (
             <span className="shrink-0 rounded bg-gold/15 px-2 py-0.5 text-[10px] font-semibold text-gold tracking-wide">
@@ -119,7 +119,7 @@ export default function Sidebar({
               <div className="flex items-center justify-between pb-4 border-b border-line">
                 <Link
                   href="/"
-                  aria-label="StockSense home"
+                  aria-label="StockSense AI home"
                   onClick={closeMobile}
                   className="flex items-center gap-2.5"
                 >

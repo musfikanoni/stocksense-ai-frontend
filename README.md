@@ -1,4 +1,4 @@
-# StockSense
+# StockSense AI
 
 A stock analysis web app: watchlists, price alerts and AI summaries.
 Frontend: Next.js (TypeScript), Tailwind CSS, Redux Toolkit + RTK Query, Recharts. Backend lives in a separate repo (added later).
@@ -19,11 +19,11 @@ Open http://localhost:3000
 (Write this in your own words after each step.)
 
 ## Data layer
-All data is served dynamically from the real-world StockSense API backend via Redux Toolkit and RTK Query (`redux/api/`).
+All data is served dynamically from the real-world StockSense AI API backend via Redux Toolkit and RTK Query (`redux/api/`).
 Endpoints include authentication, stocks, watchlists, alerts, pricing plans, dashboard metrics, and administrative features.
 
 ## About the project (plain English)
-StockSense helps people follow stocks. A user saves stocks to a watchlist, sees an AI-style
+StockSense AI helps people follow stocks. A user saves stocks to a watchlist, sees an AI-style
 signal for each one, and gets alerts when the price or signal changes.
 The signal and prices are demo data for now and are not financial advice.
 

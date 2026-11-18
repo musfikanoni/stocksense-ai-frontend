@@ -142,7 +142,7 @@ export default function ForgotPassword() {
         onSubmit={next}
         className="animate-scale-in w-full max-w-md space-y-5 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
       >
-        <Link href="/" aria-label="StockSense home" className="flex justify-center">
+        <Link href="/" aria-label="StockSense AI home" className="flex justify-center">
           <Brand />
         </Link>
         <div className="space-y-1 text-center">
