@@ -26,6 +26,11 @@ export const baseApi = createApi({
       return headers;
     },
   }),
+ 
+  keepUnusedDataFor: 300,
+  
+  refetchOnFocus: false,
+  refetchOnReconnect: true,
   tagTypes: [
     "Stock",
     "Watchlist",

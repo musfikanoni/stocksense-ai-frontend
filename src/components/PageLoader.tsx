@@ -141,8 +141,14 @@ export default function PageLoader({
     setMounted(true);
 
     if (autoClose) {
-      // Smooth progress bar to 100% then finish
-      const duration = 2200;
+      // If user already saw splash in this session, skip immediately for instant page render
+      if (typeof window !== "undefined" && sessionStorage.getItem("ss_splash_shown")) {
+        setDone(true);
+        return;
+      }
+
+      // First entrance in session: snappy 650ms high-fidelity branded welcome
+      const duration = 650;
       const start = performance.now();
       let raf: number;
 
@@ -155,7 +161,10 @@ export default function PageLoader({
         if (p < 1) {
           raf = requestAnimationFrame(step);
         } else {
-          setTimeout(() => setDone(true), 300);
+          try {
+            sessionStorage.setItem("ss_splash_shown", "1");
+          } catch {}
+          setTimeout(() => setDone(true), 150);
         }
       };
       raf = requestAnimationFrame(step);

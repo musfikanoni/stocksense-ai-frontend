@@ -11,16 +11,18 @@ import Avatar from "@/components/Avatar";
 import Helmet from "@/components/Helmet";
 import StatCard from "@/components/StatCard";
 import { Icon } from "@/components/icons";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function AdminReviewsView() {
   const [q, setQ] = useState("");
+  const debouncedQ = useDebounce(q, 300);
   const [status, setStatus] = useState("All Status");
   const [page, setPage] = useState(1);
   const [selectedReview, setSelectedReview] = useState<ReviewItem | null>(null);
   const [reviewToDelete, setReviewToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const { data, isLoading } = useGetAdminReviewsQuery({
-    q: q.trim() || undefined,
+    q: debouncedQ.trim() || undefined,
     status: status !== "All Status" ? status.toLowerCase() : undefined,
     page,
     limit: 10,

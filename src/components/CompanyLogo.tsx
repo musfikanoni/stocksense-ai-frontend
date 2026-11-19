@@ -32,6 +32,7 @@ export default function CompanyLogo({
           className="h-full w-full object-contain rounded-full"
           onError={() => setError(true)}
           loading="lazy"
+          decoding="async"
         />
       </span>
     );

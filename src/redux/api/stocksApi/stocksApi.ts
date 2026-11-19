@@ -9,6 +9,7 @@ export const stocksApi = baseApi.injectEndpoints({
         params: arg && arg.q ? { q: arg.q } : undefined,
       }),
       providesTags: ["Stock"],
+      keepUnusedDataFor: 180,
     }),
     getStock: builder.query<Stock, string>({
       query: (symbol) => `/api/stocks/${symbol}`,
@@ -25,6 +26,7 @@ export const stocksApi = baseApi.injectEndpoints({
     }),
     getMarketBias: builder.query<MarketBiasItem[], void>({
       query: () => "/api/stocks/market/bias",
+      keepUnusedDataFor: 180,
     }),
     getMarketStatus: builder.query<
       {

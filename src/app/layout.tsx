@@ -3,7 +3,11 @@ import { Sora } from "next/font/google";
 import "@/app/globals.css";
 import Providers from "@/providers/AppProviders";
 
-const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",

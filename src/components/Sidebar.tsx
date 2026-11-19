@@ -74,6 +74,7 @@ export default function Sidebar({
               <Link
                 key={i.href}
                 href={i.href}
+                prefetch={true}
                 aria-current={on ? "page" : undefined}
                 className={`flex items-center gap-2.5 lg:gap-3 whitespace-nowrap rounded-lg px-2.5 py-2 lg:px-3 lg:py-2.5 text-xs lg:text-sm transition duration-200 ${
                   on
@@ -148,6 +149,7 @@ export default function Sidebar({
                     <Link
                       key={i.href}
                       href={i.href}
+                      prefetch={true}
                       onClick={closeMobile}
                       aria-current={on ? "page" : undefined}
                       className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm transition duration-200 ${

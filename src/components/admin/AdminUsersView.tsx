@@ -10,17 +10,19 @@ import {
 import Avatar from "@/components/Avatar";
 import StatCard from "@/components/StatCard";
 import Helmet from "@/components/Helmet";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const planOptions = ["All Plan", "Free", "Premium (Monthly)", "Premium (Yearly)"] as const;
 
 export default function AdminUsersView() {
   const [q, setQ] = useState("");
+  const debouncedQ = useDebounce(q, 300);
   const [status, setStatus] = useState("All Status");
   const [plan, setPlan] = useState("All Plan");
 
   const { data: stats } = useGetAdminStatsQuery();
   const { data: usersData, isLoading } = useGetAdminUsersQuery({
-    q: q || undefined,
+    q: debouncedQ || undefined,
     status: status !== "All Status" ? status : undefined,
     plan: plan !== "All Plan" ? plan : undefined,
   });
