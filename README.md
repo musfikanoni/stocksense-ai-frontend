@@ -2,13 +2,13 @@
 
 <img src="./public/logo.png" alt="StockSense AI Logo" height="64" />
 
-# StockSense AI — Frontend
+# StockSense AI
 
 ### Institutional-Grade AI Stock Analysis Platform
 
 **Next.js 14 · TypeScript · Redux Toolkit · Tailwind CSS · Recharts**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-f5c84b?style=for-the-badge&logo=vercel&logoColor=black)](https://stocksense-ai-frontend.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-f5c84b?style=for-the-badge&logo=vercel&logoColor=black)](https://stocksense-ai-iota.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
@@ -23,7 +23,7 @@
 
 ## 📋 Table of Contents
 
-- [Live Demo & Credentials](#-live-demo--credentials)
+<!-- - [Live Demo & Credentials](#-live-demo--credentials) -->
 - [Core Concepts](#-core-concepts)
 - [Key Features](#-key-features)
 - [Data Sources — Twelve Data & Simulated Mode](#-data-sources--twelve-data--simulated-mode)
@@ -36,7 +36,7 @@
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
 
----
+<!-- ---
 
 ## 🚀 Live Demo & Credentials
 
@@ -47,7 +47,7 @@ The app is deployed and fully functional. Use the **1-Click Demo Access** panel 
 | 👑 **Admin** | `admin@stocksense.dev` | `Admin@12345` | Full admin portal — users, billing, plans, policy |
 | 📈 **Trader** | `musfikaaoni@gmail.com` | `User@12345` | Full user dashboard — stocks, alerts, watchlist |
 
-> The login page detects recruiter context and surfaces a **"Recruiter Demo Access"** UI section with one-click credential filling — a deliberate UX touch that demonstrates product thinking.
+> The login page detects recruiter context and surfaces a **"Recruiter Demo Access"** UI section with one-click credential filling — a deliberate UX touch that demonstrates product thinking. -->
 
 ---
 
@@ -496,13 +496,13 @@ A universal `<Skeleton>` primitive (`bg-white/5 animate-pulse rounded`) is compo
 ### Prerequisites
 
 - Node.js ≥ 18
-- A running instance of the [StockSense AI Backend](https://github.com/your-username/stocksense-ai-backend)
+- A running instance of the [StockSense AI Backend](https://github.com/musfikanoni/stocksense-ai-backend)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/stocksense-ai-frontend.git
+git clone https://github.com/musfikanoni/stocksense-ai-frontend.git
 cd stocksense-ai-frontend
 
 # Install dependencies
@@ -569,7 +569,7 @@ All types live in `src/types/index.ts`. `src/redux/type.ts` is a pure re-export 
 
 This project was architected and built as a portfolio piece demonstrating production-level frontend engineering — not just a UI mockup. Every decision — from RTK Query tag invalidation to transparent data source labelling to the dual-layer Google auth button — reflects deliberate thinking about real-world constraints, developer experience, and user trust.
 
-The goal was to build something that a **senior engineer would be proud to maintain**.
+The goal was to build a product that meets the engineering standards a **senior engineer would expect from a production-ready application**.
 
 ---
 
