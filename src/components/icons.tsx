@@ -51,7 +51,7 @@ export function BrandMark({ className = "h-9 w-auto" }: { className?: string }) 
       alt="StockSense AI Logo"
       width={1024}
       height={669}
-      className={`object-contain shrink-0 ${className}`}
+      className={`object-contain shrink-0 transition-transform duration-300 hover:scale-105 ${className}`}
       priority
     />
   );

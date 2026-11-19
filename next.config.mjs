@@ -27,7 +27,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "sonner", "@reduxjs/toolkit"],
   },
 
-  // HTTP Cache-Control headers for static assets
+  // HTTP Cache-Control headers for public static assets (images, icons)
   async headers() {
     return [
       {
@@ -35,16 +35,7 @@ const nextConfig = {
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
           },
         ],
       },

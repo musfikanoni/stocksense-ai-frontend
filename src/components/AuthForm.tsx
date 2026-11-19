@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import AuthShell from "./AuthShell";
 import Terms from "./Terms";
 import { Brand } from "./icons";
+import { Crown, TrendingUp, Zap } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 import { setSession } from "@/redux/features/user/userSlice";
 import {
@@ -107,12 +108,38 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const signup = mode === "signup";
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [formValues, setFormValues] = useState<Record<string, string>>({
+    name: "",
+    email: "",
+    password: "",
+    confirm: "",
+  });
 
   const [loginApi, { isLoading: isLoginLoading }] = useLoginMutation();
   const [signupApi, { isLoading: isSignupLoading }] = useSignupMutation();
   const [googleAuthApi, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
 
   const busy = isLoginLoading || isSignupLoading || isGoogleLoading;
+
+  const fillAdminCredentials = () => {
+    setError("");
+    setFormValues((prev) => ({
+      ...prev,
+      email: "admin@stocksense.dev",
+      password: "Admin@12345",
+    }));
+    toast.success("Admin demo credentials filled! Click Log In to enter admin portal.");
+  };
+
+  const fillUserCredentials = () => {
+    setError("");
+    setFormValues((prev) => ({
+      ...prev,
+      email: "musfikaaoni@gmail.com",
+      password: "User@12345",
+    }));
+    toast.success("Trader demo credentials filled! Click Log In to enter user dashboard.");
+  };
 
   const fields: Field[] = signup
     ? [
@@ -136,10 +163,10 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     e.preventDefault();
     setError("");
     const d = new FormData(e.currentTarget);
-    const name = String(d.get("name") ?? "").trim();
-    const email = String(d.get("email") ?? "").trim().toLowerCase();
-    const pwd = String(d.get("password") ?? "");
-    const confirm = String(d.get("confirm") ?? "");
+    const name = (formValues.name || String(d.get("name") ?? "")).trim();
+    const email = (formValues.email || String(d.get("email") ?? "")).trim().toLowerCase();
+    const pwd = formValues.password || String(d.get("password") ?? "");
+    const confirm = formValues.confirm || String(d.get("confirm") ?? "");
 
     if (signup && !name) {
       const msg = "Please enter your name.";
@@ -298,7 +325,60 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
               : "Already have an account? Please enter your email & password to log in"}
           </p>
         </div>
-        <div className="space-y-3 pt-2">
+
+        {!signup && (
+          <div className="rounded-2xl border border-gold/30 bg-[#161208]/90 p-3.5 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold">
+                <Zap className="h-3.5 w-3.5 text-gold animate-pulse" />
+                Recruiter Demo Access
+              </span>
+              <span className="text-[10px] text-mute">1-Click Auto Fill</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={fillAdminCredentials}
+                className="group relative flex flex-col items-start gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-gold group-hover:text-gold-light">
+                    <Crown className="h-3.5 w-3.5 text-gold" />
+                    Admin
+                  </span>
+                  <span className="rounded bg-gold/20 px-1 py-0.5 text-[9px] font-medium text-gold/90">
+                    Full Portal
+                  </span>
+                </div>
+                <p className="text-[10px] text-mute line-clamp-1 group-hover:text-white/80">
+                  admin@stocksense.dev
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={fillUserCredentials}
+                className="group relative flex flex-col items-start gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-white group-hover:text-gold">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-400 group-hover:text-gold" />
+                    Trader
+                  </span>
+                  <span className="rounded bg-emerald-500/15 px-1 py-0.5 text-[9px] font-medium text-emerald-400">
+                    AI Signals
+                  </span>
+                </div>
+                <p className="text-[10px] text-mute line-clamp-1 group-hover:text-white/80">
+                  musfikaaoni@gmail.com
+                </p>
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-3 pt-1">
           {fields.map((f) => (
             <div key={f.name} className="relative">
               <input
@@ -306,6 +386,10 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 aria-label={f.ph}
                 placeholder={f.ph}
                 required
+                value={formValues[f.name] ?? ""}
+                onChange={(e) =>
+                  setFormValues((prev) => ({ ...prev, [f.name]: e.target.value }))
+                }
                 minLength={f.type === "password" ? 6 : undefined}
                 type={f.type === "password" && show ? "text" : f.type}
                 autoComplete={

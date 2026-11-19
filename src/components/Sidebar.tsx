@@ -76,10 +76,10 @@ export default function Sidebar({
                 href={i.href}
                 prefetch={true}
                 aria-current={on ? "page" : undefined}
-                className={`flex items-center gap-2.5 lg:gap-3 whitespace-nowrap rounded-lg px-2.5 py-2 lg:px-3 lg:py-2.5 text-xs lg:text-sm transition duration-200 ${
+                className={`flex items-center gap-2.5 lg:gap-3 whitespace-nowrap rounded-lg px-2.5 py-2 lg:px-3 lg:py-2.5 text-xs lg:text-sm transition-all duration-200 ease-out active:scale-[0.98] ${
                   on
-                    ? "bg-gold/15 font-semibold text-gold shadow-[inset_2px_0_0_#f5c84b]"
-                    : "text-mute hover:bg-white/5 hover:text-white"
+                    ? "bg-gold/15 font-semibold text-gold shadow-[inset_3px_0_0_#f5c84b]"
+                    : "text-mute hover:bg-white/5 hover:text-white hover:translate-x-1"
                 }`}
               >
                 {i.icon === "gear" || i.icon === "settings" ? (
@@ -152,10 +152,10 @@ export default function Sidebar({
                       prefetch={true}
                       onClick={closeMobile}
                       aria-current={on ? "page" : undefined}
-                      className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm transition duration-200 ${
+                      className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm transition-all duration-200 ease-out active:scale-[0.98] ${
                         on
-                          ? "bg-gold/15 font-semibold text-gold shadow-[inset_2px_0_0_#f5c84b]"
-                          : "text-mute hover:bg-white/5 hover:text-white"
+                          ? "bg-gold/15 font-semibold text-gold shadow-[inset_3px_0_0_#f5c84b]"
+                          : "text-mute hover:bg-white/5 hover:text-white hover:translate-x-1"
                       }`}
                     >
                       {i.icon === "gear" || i.icon === "settings" ? (

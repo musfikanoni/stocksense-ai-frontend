@@ -105,7 +105,7 @@ function TickerBadge({ text, change }: { text: string; change: string }) {
   const up = change.startsWith("+");
   return (
     <span
-      className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-mono"
+      className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-mono transition-transform duration-200 hover:scale-110 cursor-default"
       style={{
         background: up
           ? "rgba(61,220,132,0.12)"
