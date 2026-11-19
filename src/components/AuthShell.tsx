@@ -10,7 +10,7 @@ const facts = [
 
 export default function AuthShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-ink">
+    <main className="min-h-screen w-full flex items-center justify-center p-3 sm:p-6 lg:p-8 bg-ink">
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[calc(100vh-3rem)]">
         {/* Left Side: Brand Visual Card (Visible on lg screens) */}
         <section className="relative hidden lg:flex flex-col justify-between h-full min-h-[580px] overflow-hidden rounded-3xl border border-white/10 p-8 shadow-2xl bg-[#0d0b06]">

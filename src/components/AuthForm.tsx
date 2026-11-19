@@ -144,12 +144,12 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const fields: Field[] = signup
     ? [
         { name: "name", type: "text", ph: "Enter your full name" },
-        { name: "email", type: "email", ph: "Enter your email address" },
-        { name: "password", type: "password", ph: "Enter a secure password (min 6 characters)" },
-        { name: "confirm", type: "password", ph: "Confirm your password" },
+        { name: "email", type: "email", ph: "Enter your email" },
+        { name: "password", type: "password", ph: "Password (min 6 characters)" },
+        { name: "confirm", type: "password", ph: "Confirm password" },
       ]
     : [
-        { name: "email", type: "email", ph: "Enter your registered email" },
+        { name: "email", type: "email", ph: "Enter your email" },
         { name: "password", type: "password", ph: "Enter your password" },
       ];
 
@@ -306,20 +306,20 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     <AuthShell>
       <form
         onSubmit={submit}
-        className="animate-scale-in w-full max-w-md space-y-4 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-6 sm:p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
+        className="animate-scale-in w-full max-w-md space-y-3.5 sm:space-y-4 rounded-2xl sm:rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-4 sm:p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
       >
         <Link
           href="/"
           aria-label="StockSense AI home"
-          className="mb-2 flex justify-center lg:hidden"
+          className="mb-1.5 flex justify-center lg:hidden"
         >
-          <Brand />
+          <Brand iconClass="h-7 w-auto" textClass="text-base sm:text-lg" />
         </Link>
         <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-xl sm:text-2xl font-bold">
             {signup ? "Create Account" : "Welcome back!"}
           </h1>
-          <p className="text-xs text-mute">
+          <p className="text-[11px] sm:text-xs text-mute px-1">
             {signup
               ? "Please provide your required information to create an account"
               : "Already have an account? Please enter your email & password to log in"}
@@ -327,31 +327,33 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </div>
 
         {!signup && (
-          <div className="rounded-2xl border border-gold/30 bg-[#161208]/90 p-3.5 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-            <div className="mb-2.5 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold">
-                <Zap className="h-3.5 w-3.5 text-gold animate-pulse" />
-                Recruiter Demo Access
+          <div className="rounded-xl sm:rounded-2xl border border-gold/30 bg-[#161208]/90 p-2.5 sm:p-3.5 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+            <div className="mb-2 flex items-center justify-between gap-1.5">
+              <span className="inline-flex items-center gap-1.5 text-[10px] min-[360px]:text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-gold">
+                <Zap className="h-3.5 w-3.5 text-gold animate-pulse shrink-0" />
+                <span>Recruiter Demo Access</span>
               </span>
-              <span className="text-[10px] text-mute">1-Click Auto Fill</span>
+              <span className="text-[9px] min-[360px]:text-[10px] text-mute shrink-0 whitespace-nowrap">
+                1-Click Auto Fill
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2 sm:gap-2.5">
               <button
                 type="button"
                 onClick={fillAdminCredentials}
-                className="group relative flex flex-col items-start gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
+                className="group relative flex flex-col items-start gap-0.5 sm:gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2 sm:p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
               >
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5 text-xs font-bold text-gold group-hover:text-gold-light">
-                    <Crown className="h-3.5 w-3.5 text-gold" />
+                    <Crown className="h-3.5 w-3.5 text-gold shrink-0" />
                     Admin
                   </span>
-                  <span className="rounded bg-gold/20 px-1 py-0.5 text-[9px] font-medium text-gold/90">
+                  <span className="rounded bg-gold/20 px-1.5 py-0.5 text-[9px] font-medium text-gold/90 shrink-0">
                     Full Portal
                   </span>
                 </div>
-                <p className="text-[10px] text-mute line-clamp-1 group-hover:text-white/80">
+                <p className="text-[10px] text-mute truncate w-full group-hover:text-white/80">
                   admin@stocksense.dev
                 </p>
               </button>
@@ -359,18 +361,18 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
               <button
                 type="button"
                 onClick={fillUserCredentials}
-                className="group relative flex flex-col items-start gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
+                className="group relative flex flex-col items-start gap-0.5 sm:gap-1 rounded-xl border border-gold/30 bg-[#1f190a] p-2 sm:p-2.5 text-left transition-all duration-200 hover:border-gold hover:bg-gold/15 hover:shadow-[0_0_15px_rgba(245,200,75,0.25)] active:scale-[0.98]"
               >
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5 text-xs font-bold text-white group-hover:text-gold">
-                    <TrendingUp className="h-3.5 w-3.5 text-emerald-400 group-hover:text-gold" />
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-400 group-hover:text-gold shrink-0" />
                     Trader
                   </span>
-                  <span className="rounded bg-emerald-500/15 px-1 py-0.5 text-[9px] font-medium text-emerald-400">
+                  <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-medium text-emerald-400 shrink-0">
                     AI Signals
                   </span>
                 </div>
-                <p className="text-[10px] text-mute line-clamp-1 group-hover:text-white/80">
+                <p className="text-[10px] text-mute truncate w-full group-hover:text-white/80">
                   musfikaaoni@gmail.com
                 </p>
               </button>
@@ -378,7 +380,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </div>
         )}
 
-        <div className="space-y-3 pt-1">
+        <div className="space-y-2.5 sm:space-y-3 pt-0.5">
           {fields.map((f) => (
             <div key={f.name} className="relative">
               <input
@@ -401,7 +403,9 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
                     ? "email"
                     : "name"
                 }
-                className="input !border-gold/20 !py-3 !pr-14"
+                className={`input !border-gold/20 !py-2.5 sm:!py-3 text-xs sm:text-sm ${
+                  f.type === "password" ? "!pr-14" : ""
+                }`}
               />
               {f.type === "password" && f.name === "password" && (
                 <button
@@ -418,21 +422,21 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </div>
 
         {error && (
-          <div role="alert" className="animate-fade-up rounded-xl border border-down/40 bg-down/15 p-3.5 text-sm text-down">
-            <div className="flex items-start gap-2.5">
-              <span className="shrink-0 text-base">⚠️</span>
+          <div role="alert" className="animate-fade-up rounded-xl border border-down/40 bg-down/15 p-3 text-xs sm:text-sm text-down">
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 text-sm">⚠️</span>
               <div className="flex-1 leading-snug">
                 <strong className="block font-semibold">
                   {signup ? "Account Creation Failed" : "Sign In Failed"}
                 </strong>
-                <span className="text-xs text-white/90">{error}</span>
+                <span className="text-[11px] sm:text-xs text-white/90">{error}</span>
               </div>
             </div>
           </div>
         )}
 
         <button
-          className="btn-gold w-full !py-3 disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn-gold w-full !py-2.5 sm:!py-3 text-xs sm:text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
           type="submit"
           disabled={busy}
         >
@@ -442,7 +446,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {!signup && (
           <Link
             href="/forgot-password"
-            className="block text-center text-sm text-gold transition hover:underline"
+            className="block text-center text-xs sm:text-sm text-gold transition hover:underline"
           >
             Forgot Password?
           </Link>
@@ -459,7 +463,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
             type="button"
             onClick={handleGoogleClick}
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-3 text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-gold/20 bg-white/5 py-2.5 sm:py-3 text-xs sm:text-sm transition duration-200 hover:border-gold/60 hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
           >
             <GoogleG />
             {isGoogleLoading ? "Connecting to Google..." : "Continue With Google"}
@@ -473,7 +477,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
         <Link
           href={signup ? "/login" : "/signup"}
-          className="block rounded-lg border border-gold/40 py-3 text-center text-sm font-medium text-gold transition duration-200 hover:bg-gold/10 active:scale-[0.98]"
+          className="block rounded-lg border border-gold/40 py-2.5 sm:py-3 text-center text-xs sm:text-sm font-medium text-gold transition duration-200 hover:bg-gold/10 active:scale-[0.98]"
         >
           {signup ? "Log In" : "Create Account"}
         </Link>

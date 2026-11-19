@@ -26,7 +26,7 @@ function Otp({
     onChange(v);
   };
   return (
-    <div className="flex gap-2" role="group" aria-label="6 digit code">
+    <div className="flex gap-1 sm:gap-2" role="group" aria-label="6 digit code">
       {value.map((d, i) => (
         <input
           key={i}
@@ -37,7 +37,7 @@ function Otp({
           maxLength={1}
           aria-label={`Digit ${i + 1}`}
           value={d}
-          className="input min-w-0 !border-gold/20 !px-0 !py-3 text-center text-lg"
+          className="input min-w-0 !border-gold/20 !px-0 !py-2.5 sm:!py-3 text-center text-base sm:text-lg"
           onChange={(e) => {
             const c = e.target.value.replace(/\D/g, "").slice(-1);
             set(i, c);
@@ -170,15 +170,15 @@ export default function ForgotPasswordView() {
       <form
         key={step}
         onSubmit={next}
-        className="animate-scale-in w-full max-w-md space-y-5 rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
+        className="animate-scale-in w-full max-w-md space-y-4 sm:space-y-5 rounded-2xl sm:rounded-3xl border border-gold/20 bg-gradient-to-b from-[#1b1608] to-[#0c0a05] p-4 sm:p-8 shadow-[0_20px_60px_-20px_rgba(245,200,75,0.25)]"
       >
         <Link href="/" aria-label="StockSense AI home" className="flex justify-center">
-          <Brand />
+          <Brand iconClass="h-7 w-auto" textClass="text-base sm:text-lg" />
         </Link>
         <div className="space-y-1 text-center">
           <p className="text-xs text-mute">Step {step + 1} of 3</p>
-          <h1 className="text-2xl font-bold">{titles[step]}</h1>
-          <p className="text-xs text-mute">{hints[step]}</p>
+          <h1 className="text-xl sm:text-2xl font-bold">{titles[step]}</h1>
+          <p className="text-[11px] sm:text-xs text-mute px-1">{hints[step]}</p>
         </div>
         {step === 0 && (
           <input
@@ -186,10 +186,10 @@ export default function ForgotPasswordView() {
             required
             autoFocus
             aria-label="Email address"
-            placeholder="Enter your email address"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="input !border-gold/20 !py-3"
+            className="input !border-gold/20 !py-2.5 sm:!py-3 text-xs sm:text-sm"
           />
         )}
         {step === 1 && (
@@ -228,7 +228,7 @@ export default function ForgotPasswordView() {
               placeholder="Create a new password"
               value={pw}
               onChange={(e) => setPw(e.target.value)}
-              className="input !border-gold/20 !py-3"
+              className="input !border-gold/20 !py-2.5 sm:!py-3 text-xs sm:text-sm"
             />
             <input
               type="password"
@@ -237,17 +237,17 @@ export default function ForgotPasswordView() {
               placeholder="Confirm password"
               value={pw2}
               onChange={(e) => setPw2(e.target.value)}
-              className="input !border-gold/20 !py-3"
+              className="input !border-gold/20 !py-2.5 sm:!py-3 text-xs sm:text-sm"
             />
           </div>
         )}
         {err && (
-          <p role="alert" className="text-center text-sm text-down">
+          <p role="alert" className="text-center text-xs sm:text-sm text-down">
             {err}
           </p>
         )}
         <button
-          className="btn-gold w-full !py-3"
+          className="btn-gold w-full !py-2.5 sm:!py-3 text-xs sm:text-sm font-semibold"
           type="submit"
           disabled={busy || (step === 1 && otp.some((d) => !d))}
         >
