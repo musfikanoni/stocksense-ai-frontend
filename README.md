@@ -569,7 +569,7 @@ All types live in `src/types/index.ts`. `src/redux/type.ts` is a pure re-export 
 
 This project was architected and built as a portfolio piece demonstrating production-level frontend engineering — not just a UI mockup. Every decision — from RTK Query tag invalidation to transparent data source labelling to the dual-layer Google auth button — reflects deliberate thinking about real-world constraints, developer experience, and user trust.
 
-The goal was to build a product that meets the engineering standards a **senior engineer would expect from a production-ready application**.
+The goal was to build something that meets **real-world production standards**.
 
 ---
 
