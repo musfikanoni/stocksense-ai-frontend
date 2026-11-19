@@ -22,10 +22,10 @@ export const metadata: Metadata = {
   description: "Watchlists, price alerts and AI summaries for the stocks you follow.",
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/logo.png", type: "image/png" },
-      { url: "/favicon.ico" },
     ],
-    shortcut: "/logo.png",
+    shortcut: "/favicon.ico",
     apple: "/logo.png",
   },
 };

@@ -1,105 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-
-/* Fake candlestick data for the animated chart */
-const CANDLES = [
-  { h: 72, l: 48, o: 55, c: 68 },
-  { h: 78, l: 60, o: 68, c: 62 },
-  { h: 85, l: 58, o: 62, c: 80 },
-  { h: 88, l: 70, o: 80, c: 74 },
-  { h: 90, l: 68, o: 74, c: 86 },
-  { h: 92, l: 76, o: 86, c: 78 },
-  { h: 95, l: 72, o: 78, c: 90 },
-];
-
-function CandleChart({ loop = false }: { loop?: boolean }) {
-  const [visible, setVisible] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setVisible((v) => (v < CANDLES.length ? v + 1 : loop ? 1 : v));
-    }, 220);
-    return () => clearInterval(id);
-  }, [loop]);
-
-  const maxH = 100;
-
-  return (
-    <svg
-      viewBox="0 0 112 100"
-      className="w-28 h-28"
-      aria-hidden="true"
-    >
-      {/* Subtle grid lines */}
-      {[25, 50, 75].map((y) => (
-        <line
-          key={y}
-          x1="0"
-          y1={y}
-          x2="112"
-          y2={y}
-          stroke="rgba(245,200,75,0.08)"
-          strokeWidth="0.5"
-        />
-      ))}
-
-      {CANDLES.map((c, i) => {
-        const x = 8 + i * 15;
-        const bullish = c.c >= c.o;
-        const color = bullish ? "#3ddc84" : "#ff4d5e";
-        const bodyTop = Math.min(c.o, c.c);
-        const bodyH = Math.abs(c.c - c.o) || 2;
-        const opacity = i < visible ? 1 : 0;
-        const scaledBodyTop = maxH - c.h + (c.h - bodyTop);
-        const scaledBodyH = bodyH;
-        const wickTop = maxH - c.h;
-        const wickBot = maxH - c.l;
-
-        return (
-          <g
-            key={i}
-            style={{
-              opacity,
-              transition: "opacity 0.25s ease",
-            }}
-          >
-            {/* Wick */}
-            <line
-              x1={x + 3}
-              y1={wickTop}
-              x2={x + 3}
-              y2={wickBot}
-              stroke={color}
-              strokeWidth="1"
-            />
-            {/* Body */}
-            <rect
-              x={x}
-              y={scaledBodyTop}
-              width="6"
-              height={scaledBodyH}
-              rx="0.5"
-              fill={color}
-            />
-          </g>
-        );
-      })}
-
-      {/* Moving average line */}
-      <polyline
-        points={CANDLES.slice(0, visible)
-          .map((c, i) => `${8 + i * 15 + 3},${maxH - (c.h + c.l) / 2}`)
-          .join(" ")}
-        fill="none"
-        stroke="rgba(245,200,75,0.7)"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        style={{ transition: "all 0.25s ease" }}
-      />
-    </svg>
-  );
-}
+import Image from "next/image";
 
 function TickerBadge({ text, change }: { text: string; change: string }) {
   const up = change.startsWith("+");
@@ -251,39 +152,20 @@ export default function PageLoader({
           animation: mounted ? "fadeUp 0.5s cubic-bezier(.2,.7,.2,1) both" : "none",
         }}
       >
-        {/* Logo + Candle Chart side by side */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-          {/* Logo mark */}
+        {/* Brand New 3D Candlestick Logo from Navbar (Centered) */}
+        <div className="relative flex items-center justify-center py-1">
           <div
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: 14,
-              background: "linear-gradient(135deg, #c99a1e, #f5c84b, #ffe58a)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 32px rgba(245,200,75,0.35)",
-              flexShrink: 0,
-            }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="28"
-              height="28"
-              fill="none"
-              stroke="#000"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-              <polyline points="16 7 22 7 22 13" />
-            </svg>
-          </div>
-
-          {/* Animated candlestick chart */}
-          <CandleChart loop={!autoClose} />
+            aria-hidden="true"
+            className="absolute -inset-4 rounded-full bg-gold/25 blur-2xl animate-pulse"
+          />
+          <Image
+            src="/logo.png"
+            alt="StockSense AI Logo"
+            width={1024}
+            height={669}
+            priority
+            className="relative h-20 sm:h-24 w-auto object-contain drop-shadow-[0_10px_35px_rgba(245,200,75,0.45)] transition-transform duration-500 hover:scale-105"
+          />
         </div>
 
         {/* Brand name */}
